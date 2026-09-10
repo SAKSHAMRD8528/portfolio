@@ -2067,3 +2067,334 @@ body.theme-matrix .section-line {
   }
 }
 
+/* ============================================
+   AI / ML INTERACTIVE LAB STYLES
+   ============================================ */
+.ai-lab {
+  position: relative;
+}
+
+.ml-lab-container {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 32px;
+  padding: 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  margin-top: 20px;
+  align-items: start;
+}
+
+/* Canvas Column (Left) */
+.ml-canvas-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.ml-card-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ml-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-family: var(--font-heading);
+  letter-spacing: 0.3px;
+}
+
+.ml-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  box-shadow: 0 0 10px var(--accent-primary);
+  animation: pulse-glow 1.5s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+.ml-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-family: var(--font-heading);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.ml-clear-btn:hover {
+  background: rgba(255, 60, 60, 0.15);
+  border-color: #ff4d4d;
+  color: #ff4d4d;
+}
+
+.ml-canvas-wrapper {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 2px solid var(--border-color);
+  background: #050505;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9), 0 0 15px var(--accent-glow-secondary);
+}
+
+#mlCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.ml-canvas-grid-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-size: 28px 28px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+.ml-presets-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ml-presets-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-family: var(--font-heading);
+}
+
+.ml-preset-chip {
+  padding: 4px 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.ml-preset-chip:hover {
+  background: var(--accent-primary);
+  color: #000;
+  border-color: var(--accent-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+/* Output Column (Right) */
+.ml-output-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ml-top-prediction-card {
+  padding: 18px 24px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
+}
+
+.ml-pred-badge-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  font-family: var(--font-heading);
+  margin-bottom: 8px;
+}
+
+.ml-pred-display {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.ml-pred-digit {
+  font-family: var(--font-heading);
+  font-size: 3.6rem;
+  font-weight: 800;
+  color: var(--accent-primary);
+  text-shadow: 0 0 25px var(--accent-glow);
+  line-height: 1;
+  min-width: 65px;
+  text-align: center;
+  transition: transform 0.15s ease-out;
+}
+
+.ml-pred-digit.pulse {
+  transform: scale(1.18);
+}
+
+.ml-pred-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ml-pred-conf {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+}
+
+.ml-pred-conf strong {
+  color: var(--accent-secondary);
+}
+
+.ml-pred-fps {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font-heading);
+}
+
+/* Probability Bars */
+.ml-probabilities-container {
+  padding: 18px 24px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.ml-prob-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.ml-preview-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+#mlPreviewCanvas {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+  background: #000;
+  image-rendering: pixelated;
+}
+
+.ml-prob-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 20px;
+}
+
+.ml-prob-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 3px 6px;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+}
+
+.ml-prob-row.active-digit {
+  background: var(--bg-card);
+}
+
+.ml-digit-label {
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  width: 14px;
+  text-align: right;
+}
+
+.ml-prob-row.active-digit .ml-digit-label {
+  color: var(--accent-primary);
+  text-shadow: 0 0 8px var(--accent-glow);
+}
+
+.ml-prob-bar-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.ml-prob-bar-fill {
+  height: 100%;
+  background: var(--border-color);
+  border-radius: var(--radius-full);
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s ease;
+}
+
+.ml-prob-bar-fill.top-rank {
+  background: var(--accent-gradient);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.ml-prob-val {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  width: 34px;
+  text-align: right;
+}
+
+.ml-prob-row.active-digit .ml-prob-val {
+  color: var(--accent-primary);
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .ml-lab-container {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    padding: 20px;
+  }
+  .ml-output-col {
+    width: 100%;
+  }
+  .ml-prob-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+

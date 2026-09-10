@@ -34,6 +34,7 @@
         <li><a href="#about" class="nav-link">About</a></li>
         <li><a href="#skills" class="nav-link">Skills</a></li>
         <li><a href="#projects" class="nav-link">Projects</a></li>
+        <li><a href="#ai-lab" class="nav-link">AI Lab</a></li>
         <li><a href="#experience" class="nav-link">Experience</a></li>
         <li><a href="#contact" class="nav-link">Contact</a></li>
         <li><a href="Saksham_Dhumale_Master_Resume.pdf" class="nav-link nav-resume-link" data-open-resume="true">Resume 👁</a></li>
@@ -341,6 +342,125 @@
     </div>
   </section>
 
+  <!-- ========== AI / ML INTERACTIVE LAB ========== -->
+  <section class="section ai-lab" id="ai-lab">
+    <div class="container">
+      <h2 class="section-title reveal-up">Live <span class="accent">Neural Vision Lab</span></h2>
+      <div class="section-line reveal-up"></div>
+      <p class="section-subtitle reveal-up" style="text-align: center; max-width: 680px; margin: -40px auto 45px; color: var(--text-secondary); font-size: 1rem;">
+        Draw any digit (<strong>0 – 9</strong>) on the neural canvas below. The in-browser Convolutional & Feature-Extractor network analyzes spatial activations in real-time.
+      </p>
+
+      <div class="ml-lab-container glass-card reveal-up">
+        <!-- Left: Drawing Pad -->
+        <div class="ml-canvas-col">
+          <div class="ml-card-header">
+            <div class="ml-status-badge">
+              <span class="ml-pulse-dot"></span>
+              <span id="mlStatusText">Awaiting input...</span>
+            </div>
+            <button class="ml-clear-btn" id="mlClearBtn" title="Clear Canvas">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+              <span>Clear</span>
+            </button>
+          </div>
+
+          <div class="ml-canvas-wrapper">
+            <canvas id="mlCanvas" width="280" height="280"></canvas>
+            <div class="ml-canvas-grid-overlay"></div>
+          </div>
+
+          <!-- Presets -->
+          <div class="ml-presets-row">
+            <span class="ml-presets-label">⚡ Quick Test:</span>
+            <button class="ml-preset-chip" data-preset-digit="0">0</button>
+            <button class="ml-preset-chip" data-preset-digit="3">3</button>
+            <button class="ml-preset-chip" data-preset-digit="7">7</button>
+            <button class="ml-preset-chip" data-preset-digit="8">8</button>
+          </div>
+        </div>
+
+        <!-- Right: Neural Output & Probability Distribution -->
+        <div class="ml-output-col">
+          <div class="ml-top-prediction-card">
+            <div class="ml-pred-badge-label">Predicted Digit</div>
+            <div class="ml-pred-display">
+              <div class="ml-pred-digit" id="mlTopDigit">—</div>
+              <div class="ml-pred-meta">
+                <div class="ml-pred-conf" id="mlTopConf">Draw to analyze</div>
+                <div class="ml-pred-fps">In-Browser Neural Tensor • 60 FPS</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Probability Distribution Bars -->
+          <div class="ml-probabilities-container">
+            <div class="ml-prob-header">
+              <span>Softmax Probabilities</span>
+              <div class="ml-preview-wrapper" title="28x28 Downsampled Tensor Map">
+                <span>Input Map:</span>
+                <canvas id="mlPreviewCanvas" width="28" height="28"></canvas>
+              </div>
+            </div>
+
+            <div class="ml-prob-grid">
+              <div class="ml-prob-row" data-digit="0">
+                <span class="ml-digit-label">0</span>
+                <div class="ml-prob-bar-track"><div class="ml-prob-bar-fill" data-digit="0" style="width: 0%;"></div></div>
+                <span class="ml-prob-val" data-digit="0">0%</span>
+              </div>
+              <div class="ml-prob-row" data-digit="1">
+                <span class="ml-digit-label">1</span>
+                <div class="ml-prob-bar-track"><div class="ml-prob-bar-fill" data-digit="1" style="width: 0%;"></div></div>
+                <span class="ml-prob-val" data-digit="1">0%</span>
+              </div>
+              <div class="ml-prob-row" data-digit="2">
+                <span class="ml-digit-label">2</span>
+                <div class="ml-prob-bar-track"><div class="ml-prob-bar-fill" data-digit="2" style="width: 0%;"></div></div>
+                <span class="ml-prob-val" data-digit="2">0%</span>
+              </div>
+              <div class="ml-prob-row" data-digit="3">
+                <span class="ml-digit-label">3</span>
+                <div class="ml-prob-bar-track"><div class="ml-prob-bar-fill" data-digit="3" style="width: 0%;"></div></div>
+                <span class="ml-prob-val" data-digit="3">0%</span>
+              </div>
+              <div class="ml-prob-row" data-digit="4">
+                <span class="ml-digit-label">4</span>
+                <div class="ml-prob-bar-track"><div class="ml-prob-bar-fill" data-digit="4" style="width: 0%;"></div></div>
+                <span class="ml-prob-val" data-digit="4">0%</span>
+              </div>
+              <div class="ml-prob-row" data-digit="5">
+                <span class="ml-digit-label">5</span>
+                <div class="ml-prob-bar-track"><div class="ml-prob-bar-fill" data-digit="5" style="width: 0%;"></div></div>
+                <span class="ml-prob-val" data-digit="5">0%</span>
+              </div>
+              <div class="ml-prob-row" data-digit="6">
+                <span class="ml-digit-label">6</span>
+                <div class="ml-prob-bar-track"><div class="ml-prob-bar-fill" data-digit="6" style="width: 0%;"></div></div>
+                <span class="ml-prob-val" data-digit="6">0%</span>
+              </div>
+              <div class="ml-prob-row" data-digit="7">
+                <span class="ml-digit-label">7</span>
+                <div class="ml-prob-bar-track"><div class="ml-prob-bar-fill" data-digit="7" style="width: 0%;"></div></div>
+                <span class="ml-prob-val" data-digit="7">0%</span>
+              </div>
+              <div class="ml-prob-row" data-digit="8">
+                <span class="ml-digit-label">8</span>
+                <div class="ml-prob-bar-track"><div class="ml-prob-bar-fill" data-digit="8" style="width: 0%;"></div></div>
+                <span class="ml-prob-val" data-digit="8">0%</span>
+              </div>
+              <div class="ml-prob-row" data-digit="9">
+                <span class="ml-digit-label">9</span>
+                <div class="ml-prob-bar-track"><div class="ml-prob-bar-fill" data-digit="9" style="width: 0%;"></div></div>
+                <span class="ml-prob-val" data-digit="9">0%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ========== EXPERIENCE / EDUCATION TIMELINE ========== -->
   <section class="section experience" id="experience">
     <div class="container">
@@ -562,5 +682,6 @@
 
   <script src="js/particles.js"></script>
   <script src="js/main.js?v=2.2"></script>
+  <script src="js/ml-demo.js?v=1.0"></script>
 </body>
 </html>
