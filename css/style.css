@@ -309,6 +309,17 @@ body.cursor-hover .cursor-ring {
   cursor: pointer !important;
 }
 
+/* Completely disable custom cursor on mobile / touch devices */
+@media (hover: none) and (pointer: coarse), (max-width: 768px) {
+  .cursor-dot,
+  .cursor-ring {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+}
+
 /* ===== LAYOUT ===== */
 .container {
   width: 100%;
