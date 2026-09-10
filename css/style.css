@@ -340,6 +340,22 @@ body.cursor-hover .cursor-ring {
   box-shadow: 0 0 20px var(--accent-glow);
 }
 
+.btn-hero-game {
+  border-color: rgba(255, 45, 120, 0.4);
+  color: #ff2d78;
+}
+
+.btn-hero-game:hover {
+  border-color: #ff2d78;
+  background: rgba(255, 45, 120, 0.15);
+  box-shadow: 0 0 20px rgba(255, 45, 120, 0.5);
+  color: #fff;
+}
+
+.hero-game-icon {
+  font-size: 1.1rem;
+}
+
 .section-title {
   font-family: var(--font-heading);
   font-size: clamp(2rem, 5vw, 3rem);
