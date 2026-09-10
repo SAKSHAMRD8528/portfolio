@@ -1600,9 +1600,38 @@ a.contact-detail-item:hover {
   }
 }
 
+/* ===== MOBILE OPTIMIZATIONS ===== */
+html, body {
+  overflow-x: hidden;
+}
+
 @media (max-width: 768px) {
   :root {
-    --section-padding: 70px;
+    --section-padding: 60px;
+  }
+
+  .container {
+    padding: 0 16px;
+  }
+
+  .nav-logo {
+    font-size: 1.3rem;
+  }
+
+  .nav-actions {
+    gap: 8px;
+  }
+
+  .theme-toggle,
+  .theme-palette-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .theme-dropdown {
+    right: -10px;
+    min-width: 190px;
+    max-width: calc(100vw - 32px);
   }
 
   .hamburger {
@@ -1613,7 +1642,7 @@ a.contact-detail-item:hover {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 280px;
+    width: 260px;
     height: 100vh;
     background: var(--bg-secondary);
     flex-direction: column;
@@ -1633,32 +1662,62 @@ a.contact-detail-item:hover {
     font-size: 1.1rem;
   }
 
+  .hero {
+    padding-top: calc(var(--nav-height) + 20px);
+  }
+
+  .hero-name {
+    font-size: clamp(2rem, 9vw, 3.2rem);
+    letter-spacing: -1px;
+    word-break: break-word;
+  }
+
+  .hero-cta {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: 320px;
+    margin: 32px auto 0;
+  }
+
+  .hero-cta .btn {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+
   .about-grid {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 32px;
     text-align: center;
   }
 
   .about-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
     justify-content: center;
   }
 
   .skills-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
 
   .projects-grid {
     grid-template-columns: 1fr;
+    gap: 24px;
   }
 
   .contact-grid {
     grid-template-columns: 1fr;
+    gap: 28px;
   }
 
   .timeline-item {
     grid-template-columns: 1fr;
     gap: 0;
-    padding-left: 40px;
+    padding-left: 36px;
   }
 
   .timeline-item:nth-child(odd) .timeline-card,
@@ -1686,41 +1745,50 @@ a.contact-detail-item:hover {
     transform: translateY(-36px);
   }
 
-  .hero-name {
-    letter-spacing: -1px;
-  }
-
   .footer .container {
     flex-direction: column;
     gap: 16px;
+    text-align: center;
   }
 }
 
 @media (max-width: 480px) {
   :root {
-    --section-padding: 50px;
+    --section-padding: 48px;
   }
 
   .about-stats {
-    gap: 24px;
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .stat-number, .stat-suffix {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
 
   .skill-ring svg {
-    width: 64px;
-    height: 64px;
+    width: 56px;
+    height: 56px;
   }
 
   .skill-ring {
-    width: 72px;
+    width: 64px;
   }
 
-  .hero-cta {
-    flex-direction: column;
-    align-items: center;
+  .project-card-header {
+    padding: 16px 16px 0;
+  }
+
+  .project-card-body {
+    padding: 16px;
+  }
+
+  .contact-form {
+    padding: 20px 16px;
+  }
+
+  .theme-swatches {
+    grid-template-columns: 1fr;
   }
 }
 
