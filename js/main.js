@@ -214,13 +214,22 @@
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('revealed');
-      } else {
-        entry.target.classList.remove('revealed');
+        revealObserver.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+  }, { threshold: 0.05 });
 
   revealElements.forEach(el => revealObserver.observe(el));
+
+  // Initial check for elements already in viewport
+  setTimeout(() => {
+    revealElements.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight) {
+        el.classList.add('revealed');
+      }
+    });
+  }, 100);
 
   /* ===== ANIMATED COUNTERS ===== */
   const counters = document.querySelectorAll('.stat-number');
