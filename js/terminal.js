@@ -107,8 +107,8 @@
         desc: 'View personal bio and details',
         exec: () => `
 <div class="term-res-header">👨‍💻 Saksham Dhumale:</div>
-<div class="term-line"><span class="term-accent">Role:</span> Software Engineer | Data Analyst | ML Enthusiast</div>
-<div class="term-line"><span class="term-accent">Education:</span> B.E. in Computer Science & Engineering (2022–2026)</div>
+<div class="term-line"><span class="term-accent">Role:</span> Software Engineer | Data Analyst | ML Engineer</div>
+<div class="term-line"><span class="term-accent">Degree:</span> B.E. in Computer Science & Engineering (Prof. Ram Meghe Institute)</div>
 <div class="term-line"><span class="term-accent">Focus:</span> Machine Learning, Deep Learning, Full-Stack Web Development, Data Analytics</div>
 <div class="term-line"><span class="term-accent">Location:</span> Pune / Amravati, Maharashtra, India</div>`
       },
