@@ -253,6 +253,23 @@ img { max-width: 100%; height: auto; display: block; }
 .section {
   padding: var(--section-padding) 0;
   position: relative;
+  scroll-margin-top: 80px;
+}
+
+.terminal-nav-icon {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent-primary);
+  font-weight: 700;
+  margin-right: 3px;
+}
+
+.btn-hero-terminal {
+  border-color: rgba(108, 99, 255, 0.4);
+}
+
+.btn-hero-terminal:hover {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 20px var(--accent-glow);
 }
 
 .section-title {
