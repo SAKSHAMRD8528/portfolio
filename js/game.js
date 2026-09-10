@@ -10,7 +10,6 @@
     if (typeof openGameModalFn === 'function') {
       openGameModalFn(game);
     } else {
-      // If DOM not ready yet, wait briefly
       setTimeout(() => {
         if (typeof openGameModalFn === 'function') openGameModalFn(game);
       }, 100);
@@ -104,20 +103,24 @@
       }
     }
 
-    // Canvas Dimensions
+    // Canvas Dimensions with safe fallbacks
     let width = 640;
     let height = 240;
     let GROUND_Y = 200;
 
     function resizeCanvas() {
       const container = canvas.parentElement;
-      if (container) {
-        width = Math.min(container.clientWidth - 4, 700);
-        height = currentGame === 'dino' ? 240 : 340;
-        GROUND_Y = height - 35;
-        canvas.width = width;
-        canvas.height = height;
+      let containerWidth = 640;
+      if (container && container.clientWidth > 50) {
+        containerWidth = container.clientWidth;
+      } else if (window.innerWidth) {
+        containerWidth = Math.min(window.innerWidth - 30, 680);
       }
+      width = Math.max(300, Math.min(containerWidth - 4, 700));
+      height = currentGame === 'dino' ? 240 : 340;
+      GROUND_Y = height - 35;
+      canvas.width = width;
+      canvas.height = height;
     }
 
     /* ==========================================
@@ -510,7 +513,7 @@
         });
       }
 
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < 3; i++) {
         spawnSpaceEnemy(Math.random() * -100 - 20);
       }
 
@@ -798,7 +801,9 @@
       gameModal.classList.add('active');
       gameModal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
-      switchGame(initialGame);
+      setTimeout(() => {
+        switchGame(initialGame);
+      }, 40);
     };
 
     function closeGameModal() {
@@ -842,7 +847,7 @@
     window.addEventListener('keydown', (e) => {
       if (gameModal && gameModal.classList.contains('active')) {
         if (currentGame === 'dino') {
-          if (e.code === 'Space' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+          if (e.code === 'Space' || e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
             e.preventDefault();
             dinoJump();
           } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
@@ -858,7 +863,7 @@
             e.preventDefault();
             spaceKeys.right = true;
           }
-          if (e.code === 'Space') {
+          if (e.code === 'Space' || e.key === ' ') {
             e.preventDefault();
             fireSpaceLaser();
           }
@@ -881,6 +886,7 @@
 
     // Canvas Mouse & Touch controls
     canvas.addEventListener('mousedown', (e) => {
+      e.preventDefault();
       if (currentGame === 'dino') {
         dinoJump();
       } else {
@@ -896,8 +902,8 @@
     });
 
     canvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
       if (currentGame === 'dino') {
-        e.preventDefault();
         dinoJump();
       } else {
         const rect = canvas.getBoundingClientRect();
