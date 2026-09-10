@@ -416,6 +416,15 @@ body.cursor-hover .cursor-ring {
   width: 100%;
 }
 
+.nav-resume-link {
+  color: var(--accent-primary) !important;
+  font-weight: 600;
+}
+
+.nav-resume-link:hover {
+  text-shadow: 0 0 10px var(--accent-glow);
+}
+
 .nav-actions {
   display: flex;
   align-items: center;
