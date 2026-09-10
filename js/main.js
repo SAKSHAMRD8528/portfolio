@@ -383,6 +383,42 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  /* ===== RESUME MODAL VIEWER ===== */
+  const resumeModal = document.getElementById('resumeModal');
+  const closeResumeModal = document.getElementById('closeResumeModal');
+  const resumeBackdrop = document.getElementById('resumeModalBackdrop');
+  const resumeTriggers = document.querySelectorAll('[data-open-resume]');
+
+  function openResume(e) {
+    if (e) e.preventDefault();
+    if (resumeModal) {
+      resumeModal.classList.add('active');
+      resumeModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function closeResume() {
+    if (resumeModal) {
+      resumeModal.classList.remove('active');
+      resumeModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+  }
+
+  resumeTriggers.forEach(btn => {
+    btn.addEventListener('click', openResume);
+  });
+
+  if (closeResumeModal) closeResumeModal.addEventListener('click', closeResume);
+  if (resumeBackdrop) resumeBackdrop.addEventListener('click', closeResume);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && resumeModal && resumeModal.classList.contains('active')) {
+      closeResume();
+    }
+  });
+
   /* ===== SMOOTH SCROLL FOR ALL ANCHOR LINKS ===== */
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', (e) => {
