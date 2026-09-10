@@ -211,44 +211,13 @@
   }
   if (typewriterEl) typewrite();
 
-  /* ===== SCROLL REVEAL ANIMATION ===== */
+  /* ===== SCROLL REVEAL & ONE-TIME ANIMATIONS ===== */
   const revealElements = document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right');
-
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('revealed');
-        revealObserver.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.05 });
-
-  revealElements.forEach(el => revealObserver.observe(el));
-
-  // Initial check for elements already in viewport
-  setTimeout(() => {
-    revealElements.forEach(el => {
-      const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight) {
-        el.classList.add('revealed');
-      }
-    });
-  }, 100);
-
-  /* ===== ANIMATED COUNTERS ===== */
   const counters = document.querySelectorAll('.stat-number');
-
-  const counterObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const target = parseInt(entry.target.getAttribute('data-target'));
-        animateCounter(entry.target, target);
-        counterObserver.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.5 });
-
-  counters.forEach(c => counterObserver.observe(c));
+  const skillRings = document.querySelectorAll('.skill-ring');
+  const circumference = 2 * Math.PI * 42; // r = 42
+  const timelineConnector = document.getElementById('timelineConnector');
+  const timeline = document.querySelector('.timeline');
 
   function animateCounter(el, target) {
     let current = 0;
@@ -267,42 +236,89 @@
     tick();
   }
 
-  /* ===== SKILL RING ANIMATION ===== */
-  const skillRings = document.querySelectorAll('.skill-ring');
-  const circumference = 2 * Math.PI * 42; // r = 42
+  const hasVisited = sessionStorage.getItem('portfolioVisited');
 
-  const ringObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const percent = parseInt(entry.target.getAttribute('data-percent'));
-        const progress = entry.target.querySelector('.ring-progress');
-        if (progress) {
-          const offset = circumference - (percent / 100) * circumference;
-          progress.style.strokeDashoffset = offset;
-        }
-        ringObserver.unobserve(entry.target);
+  if (hasVisited) {
+    // If the site has already loaded before in this session, show elements immediately
+    revealElements.forEach(el => el.classList.add('revealed'));
+    if (timelineConnector) timelineConnector.style.height = '100%';
+
+    counters.forEach(c => {
+      const target = c.getAttribute('data-target');
+      if (target) c.textContent = target;
+    });
+
+    skillRings.forEach(ring => {
+      const percent = parseInt(ring.getAttribute('data-percent'));
+      const progress = ring.querySelector('.ring-progress');
+      if (progress && !isNaN(percent)) {
+        progress.style.strokeDashoffset = circumference - (percent / 100) * circumference;
       }
     });
-  }, { threshold: 0.3 });
+  } else {
+    // First time site loads: mark session and run smooth animations once
+    sessionStorage.setItem('portfolioVisited', 'true');
 
-  skillRings.forEach(ring => ringObserver.observe(ring));
-
-  /* ===== TIMELINE CONNECTOR ANIMATION ===== */
-  const timelineConnector = document.getElementById('timelineConnector');
-  const timeline = document.querySelector('.timeline');
-
-  if (timelineConnector && timeline) {
-    const timelineObserver = new IntersectionObserver((entries) => {
+    const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          timelineConnector.style.height = '100%';
-        } else {
-          timelineConnector.style.height = '0%';
+          entry.target.classList.add('revealed');
+          revealObserver.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.05 });
 
-    timelineObserver.observe(timeline);
+    revealElements.forEach(el => revealObserver.observe(el));
+
+    setTimeout(() => {
+      revealElements.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight) {
+          el.classList.add('revealed');
+        }
+      });
+    }, 100);
+
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const target = parseInt(entry.target.getAttribute('data-target'));
+          animateCounter(entry.target, target);
+          counterObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    counters.forEach(c => counterObserver.observe(c));
+
+    const ringObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const percent = parseInt(entry.target.getAttribute('data-percent'));
+          const progress = entry.target.querySelector('.ring-progress');
+          if (progress) {
+            const offset = circumference - (percent / 100) * circumference;
+            progress.style.strokeDashoffset = offset;
+          }
+          ringObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    skillRings.forEach(ring => ringObserver.observe(ring));
+
+    if (timelineConnector && timeline) {
+      const timelineObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            timelineConnector.style.height = '100%';
+            timelineObserver.unobserve(timeline);
+          }
+        });
+      }, { threshold: 0.1 });
+
+      timelineObserver.observe(timeline);
+    }
   }
 
   /* ===== 3D TILT ON PROJECT CARDS ===== */
