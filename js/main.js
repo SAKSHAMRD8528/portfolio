@@ -2,7 +2,8 @@
    MAIN.JS — Core Interactions & Animations
    ============================================ */
 
-document.addEventListener('DOMContentLoaded', () => {
+(function () {
+  function initMain() {
 
 
 
@@ -440,6 +441,10 @@ document.addEventListener('DOMContentLoaded', () => {
         target.scrollIntoView({ behavior: 'smooth' });
       }
     });
-  });
-
-});
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMain);
+  } else {
+    initMain();
+  }
+})();
