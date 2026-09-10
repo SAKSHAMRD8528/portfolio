@@ -2677,7 +2677,7 @@ body.theme-matrix .section-line {
 }
 
 .arcade-tab-btn.active {
-  background: var(--color-primary);
+  background: var(--accent-primary);
   color: #fff;
   box-shadow: 0 0 10px rgba(108, 99, 255, 0.5);
 }
@@ -2814,8 +2814,8 @@ body.theme-matrix .section-line {
 }
 
 .touch-btn.fire {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
   color: #fff;
 }
 
