@@ -84,6 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
   <tr><td><span class="cmd-highlight">cat &lt;file&gt;</span></td><td>Read files (<span class="term-dim">bio.txt, stack.json, secret.txt</span>)</td></tr>
   <tr><td><span class="cmd-highlight">quote</span></td><td>Display an inspiring software/AI quote</td></tr>
   <tr><td><span class="cmd-highlight">whoami</span></td><td>Display current user status</td></tr>
+  <tr><td><span class="cmd-highlight">game</span></td><td>Launch Space Blaster arcade mini-game 🚀</td></tr>
   <tr><td><span class="cmd-highlight">clear</span></td><td>Clear terminal screen output</td></tr>
   <tr><td><span class="cmd-highlight">exit</span></td><td>Close the terminal window</td></tr>
 </table>
@@ -204,6 +205,32 @@ document.addEventListener('DOMContentLoaded', () => {
       exec: () => {
         setTimeout(closeTerminalModal, 300);
         return `<div class="term-line term-dim">Closing terminal session... Goodbye!</div>`;
+      }
+    },
+
+    game: {
+      desc: 'Launch Space Blaster arcade mini-game',
+      exec: () => {
+        closeTerminalModal();
+        setTimeout(() => {
+          if (typeof window.openGameModal === 'function') {
+            window.openGameModal();
+          }
+        }, 200);
+        return `<div class="term-line term-green">🚀 Launching Space Blaster Arcade... Get ready!</div>`;
+      }
+    },
+
+    play: {
+      desc: 'Launch Space Blaster arcade mini-game',
+      exec: () => {
+        closeTerminalModal();
+        setTimeout(() => {
+          if (typeof window.openGameModal === 'function') {
+            window.openGameModal();
+          }
+        }, 200);
+        return `<div class="term-line term-green">🚀 Launching Space Blaster Arcade... Get ready!</div>`;
       }
     },
 

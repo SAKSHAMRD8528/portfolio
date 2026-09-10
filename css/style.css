@@ -2539,3 +2539,243 @@ body.theme-matrix .section-line {
     width: 100px;
   }
 }
+
+/* ============================================
+   CYBER SPACE ARCADE GAME MODAL STYLES
+   ============================================ */
+
+.nav-game-btn {
+  background: rgba(255, 45, 120, 0.1);
+  border: 1px solid rgba(255, 45, 120, 0.35);
+  border-radius: var(--radius-full);
+  padding: 6px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ff2d78;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.nav-game-btn:hover {
+  background: #ff2d78;
+  color: #fff;
+  border-color: #ff2d78;
+  box-shadow: 0 0 16px rgba(255, 45, 120, 0.6);
+  transform: translateY(-1px);
+}
+
+.game-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 160000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition-base), visibility var(--transition-base);
+}
+
+.game-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.game-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.game-modal-container {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 720px;
+  transform: scale(0.92) translateY(20px);
+  transition: transform var(--transition-spring);
+}
+
+.game-modal-overlay.active .game-modal-container {
+  transform: scale(1) translateY(0);
+}
+
+.game-card {
+  background: #080c14;
+  border: 2px solid rgba(0, 212, 255, 0.3);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 35px rgba(0, 212, 255, 0.25);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-header {
+  background: #0f172a;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+}
+
+.game-title {
+  font-family: 'JetBrains Mono', 'Space Grotesk', monospace;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #00d4ff;
+  letter-spacing: 0.5px;
+}
+
+.game-hud {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+}
+
+.hud-label {
+  color: #8b949e;
+  font-size: 0.72rem;
+}
+
+.hud-val {
+  color: #00ff41;
+  font-weight: 700;
+}
+
+.hud-lives {
+  letter-spacing: 2px;
+  font-size: 0.85rem;
+}
+
+.game-modal-close-btn {
+  background: none;
+  border: none;
+  color: #8b949e;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all var(--transition-fast);
+}
+
+.game-modal-close-btn:hover {
+  color: #ff5f56;
+  background: rgba(255, 95, 86, 0.15);
+}
+
+.game-canvas-wrapper {
+  position: relative;
+  background: #02040a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#arcadeCanvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  cursor: crosshair !important;
+}
+
+.game-overlay-screen {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 4, 10, 0.88);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  z-index: 10;
+  animation: fadeIn 0.2s ease;
+}
+
+.game-over-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #ff2d78;
+  text-shadow: 0 0 20px rgba(255, 45, 120, 0.8);
+  letter-spacing: 2px;
+}
+
+.game-over-subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem;
+  color: #00d4ff;
+}
+
+.btn-restart {
+  margin-top: 8px;
+  cursor: pointer !important;
+}
+
+.game-controls-bar {
+  background: #0f172a;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.game-instructions {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: #8b949e;
+}
+
+.game-instructions strong {
+  color: #00d4ff;
+}
+
+.game-touch-controls {
+  display: none;
+  gap: 8px;
+}
+
+.touch-btn {
+  width: 44px;
+  height: 44px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.touch-btn.fire {
+  background: #ff2d78;
+  border-color: #ff2d78;
+}
+
+@media (max-width: 768px) {
+  .game-modal-overlay {
+    padding: 10px;
+  }
+  .game-touch-controls {
+    display: flex;
+  }
+  .game-instructions {
+    display: none;
+  }
+}
