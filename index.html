@@ -18,7 +18,7 @@
   <!-- Devicon — Technology Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.16.0/devicon.min.css" />
 
-  <link rel="stylesheet" href="css/style.css?v=3.0" />
+  <link rel="stylesheet" href="css/style.css?v=5.0" />
 </head>
 <body>
 
@@ -41,8 +41,9 @@
       <div class="nav-actions">
         <!-- Command Palette Trigger (Ctrl + K) -->
         <button class="cmd-trigger-btn" id="cmdTriggerBtn" aria-label="Open command palette (Ctrl+K)" title="Quick Command Palette (Ctrl + K)">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-          <span class="cmd-shortcut-key">Ctrl K</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          <span>Cmd Palette</span>
+          <kbd class="cmd-shortcut-key">Ctrl K</kbd>
         </button>
         <!-- Dark/Light Mode Toggle -->
         <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode">
@@ -537,6 +538,13 @@
     </div>
   </footer>
 
+  <!-- ========== FLOATING COMMAND PALETTE QUICK LAUNCHER ========== -->
+  <button class="cmd-floating-pill" id="cmdFloatingBtn" aria-label="Open Command Palette (Ctrl+K)" title="Quick Actions (Ctrl + K)">
+    <span class="cmd-pill-icon">&gt;_</span>
+    <span class="cmd-pill-text">Quick Actions</span>
+    <kbd class="cmd-pill-kbd">Ctrl K</kbd>
+  </button>
+
   <!-- ========== RESUME MODAL VIEWER ========== -->
   <div class="resume-modal-overlay" id="resumeModal" aria-hidden="true" role="dialog" aria-modal="true">
     <div class="resume-modal-backdrop" id="resumeModalBackdrop"></div>
@@ -675,6 +683,6 @@
   </div>
 
   <script src="js/particles.js"></script>
-  <script src="js/main.js?v=4.0"></script>
+  <script src="js/main.js?v=5.0"></script>
 </body>
 </html>

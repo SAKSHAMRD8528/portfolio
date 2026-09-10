@@ -422,6 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ===== COMMAND PALETTE (CTRL + K) ===== */
   const cmdPalette = document.getElementById('cmdPalette');
   const cmdTriggerBtn = document.getElementById('cmdTriggerBtn');
+  const cmdFloatingBtn = document.getElementById('cmdFloatingBtn');
   const closeCmdBtn = document.getElementById('closeCmdPalette');
   const cmdBackdrop = document.getElementById('cmdPaletteBackdrop');
   const cmdInput = document.getElementById('cmdInput');
@@ -455,6 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (cmdTriggerBtn) cmdTriggerBtn.addEventListener('click', openCmdPalette);
+  if (cmdFloatingBtn) cmdFloatingBtn.addEventListener('click', openCmdPalette);
   if (closeCmdBtn) closeCmdBtn.addEventListener('click', closeCmdPalette);
   if (cmdBackdrop) cmdBackdrop.addEventListener('click', closeCmdPalette);
 
