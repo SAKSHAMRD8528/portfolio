@@ -35,6 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const touchFireBtn = document.getElementById('touchFireBtn');
 
   let currentGame = 'dino'; // 'dino' | 'space'
+  let animationFrameId = null;
+  let isRunning = false;
+  let isGameOver = false;
 
   // Web Audio Synth for 8-bit Sound Effects
   let audioCtx = null;
@@ -83,14 +86,14 @@ document.addEventListener('DOMContentLoaded', () => {
         osc.stop(now + 0.25);
       }
     } catch (e) {
-      // Audio might fail on non-interactive environments
+      // Audio fallback
     }
   }
 
   // Canvas Dimensions
   let width = 640;
-  let height = 260;
-  let GROUND_Y = 220;
+  let height = 240;
+  let GROUND_Y = 200;
 
   function resizeCanvas() {
     const container = canvas.parentElement;
@@ -102,10 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
       canvas.height = height;
     }
   }
-
-  let animationFrameId = null;
-  let isRunning = false;
-  let isGameOver = false;
 
   /* ==========================================
      GAME 1: CHROME DINO RUNNER
@@ -123,8 +122,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const dino = {
     x: 45,
-    y: 175,
-    baseY: 175,
+    y: 156,
+    baseY: 156,
     width: 40,
     height: 44,
     duckHeight: 26,
@@ -218,9 +217,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function dinoJump() {
-    if (isGameOver) {
+    if (isGameOver || !isRunning) {
       resetActiveGame();
-      animationFrameId = requestAnimationFrame(gameLoop);
       return;
     }
     if (dino.isGrounded) {
@@ -498,7 +496,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Spawn 2 initial enemies immediately so action begins right away
     for (let i = 0; i < 2; i++) {
       spawnSpaceEnemy(Math.random() * -100 - 20);
     }
@@ -513,12 +510,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function fireSpaceLaser() {
-    if (!isRunning || isGameOver) return;
+    if (isGameOver || !isRunning) {
+      resetActiveGame();
+      return;
+    }
     const now = Date.now();
     if (now - spaceLastShot < 140) return;
     spaceLastShot = now;
 
-    // Dual plasma cannons
     spaceLasers.push({ x: player.x - 7, y: player.y - 14, vx: 0, vy: -10 });
     spaceLasers.push({ x: player.x + 7, y: player.y - 14, vx: 0, vy: -10 });
     playSound('laser');
@@ -579,7 +578,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (spaceInvulnerableTimer > 0) spaceInvulnerableTimer--;
 
-    // Render Player Ship (with flicker if invulnerable)
+    // Render Player Ship
     if (spaceInvulnerableTimer % 4 < 2) {
       ctx.fillStyle = '#00d4ff';
       ctx.beginPath();
@@ -642,7 +641,7 @@ document.addEventListener('DOMContentLoaded', () => {
           createExplosion(e.x, e.y, '#ff2d78');
           spaceEnemies.splice(i, 1);
           spaceLives--;
-          spaceInvulnerableTimer = 45; // 0.75s grace period
+          spaceInvulnerableTimer = 45;
           updateSpaceLivesHUD();
           playSound('hit');
 
@@ -693,7 +692,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function handleGameOver(finalScore, currentHigh, storageKey) {
     isRunning = false;
     isGameOver = true;
-    cancelAnimationFrame(animationFrameId);
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
     playSound('hit');
 
     if (finalScore > currentHigh) {
@@ -721,13 +723,22 @@ document.addEventListener('DOMContentLoaded', () => {
       updateAndRenderSpace();
     }
 
-    if (isRunning) {
+    if (isRunning && !isGameOver) {
       animationFrameId = requestAnimationFrame(gameLoop);
     }
   }
 
-  function resetActiveGame() {
+  function startGameLoop() {
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
     isRunning = true;
+    isGameOver = false;
+    animationFrameId = requestAnimationFrame(gameLoop);
+  }
+
+  function resetActiveGame() {
     isGameOver = false;
     if (overlayScreen) overlayScreen.style.display = 'none';
 
@@ -738,6 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
       initSpace();
       if (highScoreEl) highScoreEl.textContent = String(spaceHighScore).padStart(5, '0');
     }
+    startGameLoop();
   }
 
   function switchGame(gameType) {
@@ -763,9 +775,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     resizeCanvas();
     resetActiveGame();
-    if (!isRunning) {
-      animationFrameId = requestAnimationFrame(gameLoop);
-    }
   }
 
   if (tabDino) tabDino.addEventListener('click', () => switchGame('dino'));
@@ -784,7 +793,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!gameModal) return;
     isRunning = false;
     isGameOver = true;
-    cancelAnimationFrame(animationFrameId);
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
     gameModal.classList.remove('active');
     gameModal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
@@ -812,7 +824,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (restartBtn) {
     restartBtn.addEventListener('click', () => {
       resetActiveGame();
-      animationFrameId = requestAnimationFrame(gameLoop);
     });
   }
 
@@ -838,12 +849,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (e.code === 'Space') {
           e.preventDefault();
-          if (isGameOver) {
-            resetActiveGame();
-            animationFrameId = requestAnimationFrame(gameLoop);
-          } else {
-            fireSpaceLaser();
-          }
+          fireSpaceLaser();
         }
       }
 
@@ -867,12 +873,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentGame === 'dino') {
       dinoJump();
     } else {
-      if (isGameOver) {
-        resetActiveGame();
-        animationFrameId = requestAnimationFrame(gameLoop);
-      } else {
-        fireSpaceLaser();
-      }
+      fireSpaceLaser();
     }
   });
 
@@ -888,16 +889,11 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       dinoJump();
     } else {
-      if (isGameOver) {
-        resetActiveGame();
-        animationFrameId = requestAnimationFrame(gameLoop);
-      } else {
-        const rect = canvas.getBoundingClientRect();
-        if (e.touches && e.touches[0]) {
-          player.x = Math.max(player.width / 2, Math.min(width - player.width / 2, e.touches[0].clientX - rect.left));
-        }
-        fireSpaceLaser();
+      const rect = canvas.getBoundingClientRect();
+      if (e.touches && e.touches[0]) {
+        player.x = Math.max(player.width / 2, Math.min(width - player.width / 2, e.touches[0].clientX - rect.left));
       }
+      fireSpaceLaser();
     }
   }, { passive: false });
 
