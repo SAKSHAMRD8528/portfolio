@@ -2211,7 +2211,8 @@ body.theme-matrix .section-line {
   display: none;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: max(20px, env(safe-area-inset-top, 20px)) max(16px, env(safe-area-inset-right, 16px)) max(20px, env(safe-area-inset-bottom, 20px)) max(16px, env(safe-area-inset-left, 16px));
+  box-sizing: border-box;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -2227,7 +2228,7 @@ body.theme-matrix .section-line {
 .resume-modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.82);
+  background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
@@ -2237,7 +2238,9 @@ body.theme-matrix .section-line {
   z-index: 2;
   width: 100%;
   max-width: 960px;
-  height: 88vh;
+  height: calc(100vh - 48px);
+  height: calc(100dvh - 48px);
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
   background: var(--bg-secondary);
@@ -2247,6 +2250,7 @@ body.theme-matrix .section-line {
   transform: scale(0.94) translateY(24px);
   transition: transform var(--transition-spring);
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .resume-modal-overlay.active .resume-modal-container {
@@ -2257,9 +2261,13 @@ body.theme-matrix .section-line {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 18px;
+  padding: 10px 16px;
+  min-height: 52px;
   background: var(--bg-tertiary);
   border-bottom: 1px solid var(--border-glass);
+  flex-shrink: 0;
+  gap: 10px;
+  box-sizing: border-box;
 }
 
 .resume-modal-header-left {
@@ -2267,13 +2275,16 @@ body.theme-matrix .section-line {
   align-items: center;
   gap: 10px;
   min-width: 0;
+  flex-shrink: 1;
 }
 
 .btn-resume-back {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 6px 14px;
+  height: 36px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
@@ -2281,9 +2292,16 @@ body.theme-matrix .section-line {
   font-family: var(--font-heading);
   font-size: 0.82rem;
   font-weight: 600;
+  line-height: 1;
   cursor: pointer;
   transition: all var(--transition-fast);
   flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.btn-resume-back svg {
+  flex-shrink: 0;
+  display: block;
 }
 
 .btn-resume-back:hover {
@@ -2319,23 +2337,34 @@ body.theme-matrix .section-line {
 .resume-modal-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
 .btn-resume-action {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 7px 14px;
+  padding: 6px 12px;
+  height: 36px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
-  font-size: 0.85rem;
+  font-size: 0.84rem;
   font-weight: 500;
+  line-height: 1;
   cursor: pointer;
+  text-decoration: none;
   transition: all var(--transition-fast);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.btn-resume-action svg {
+  flex-shrink: 0;
+  display: block;
 }
 
 .btn-resume-action:hover {
@@ -2347,17 +2376,25 @@ body.theme-matrix .section-line {
 }
 
 .resume-modal-close {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  background: transparent;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
   cursor: pointer;
   transition: all var(--transition-fast);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.resume-modal-close svg {
+  flex-shrink: 0;
+  display: block;
 }
 
 .resume-modal-close:hover {
@@ -2429,50 +2466,119 @@ body.theme-matrix .section-line {
 
 @media (max-width: 768px) {
   .resume-modal-overlay {
-    padding: 8px;
+    padding: max(14px, env(safe-area-inset-top, 14px)) 10px max(14px, env(safe-area-inset-bottom, 14px)) 10px;
   }
   .resume-modal-container {
-    height: 94vh;
-    max-width: 100%;
+    height: calc(100vh - 28px);
+    height: calc(100dvh - 28px);
+    max-height: 94vh;
+    border-radius: var(--radius-md);
   }
   .resume-modal-header {
     padding: 8px 12px;
+    min-height: 48px;
     gap: 8px;
   }
   .btn-resume-back {
     padding: 5px 10px;
+    height: 34px;
     font-size: 0.78rem;
   }
   .resume-title-text {
     font-size: 0.8rem;
-    max-width: 120px;
+    max-width: 130px;
+  }
+  .btn-resume-action {
+    padding: 5px 10px;
+    height: 34px;
+    font-size: 0.78rem;
+  }
+  .resume-modal-close {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
   }
 }
 
 @media (max-width: 480px) {
   .resume-modal-overlay {
-    padding: 4px;
+    padding: max(16px, env(safe-area-inset-top, 16px)) 8px max(16px, env(safe-area-inset-bottom, 16px)) 8px;
   }
   .resume-modal-container {
-    height: 96vh;
+    height: calc(100vh - 32px);
+    height: calc(100dvh - 32px);
+    max-height: 94vh;
+    border-radius: var(--radius-md);
   }
   .resume-modal-header {
     padding: 6px 8px;
+    min-height: 46px;
     gap: 6px;
   }
+  .resume-modal-title {
+    display: none;
+  }
   .btn-resume-back {
-    padding: 4px 8px;
-    font-size: 0.72rem;
+    padding: 5px 10px;
+    height: 34px;
+    font-size: 0.76rem;
+    gap: 4px;
+  }
+  .resume-modal-actions {
+    gap: 6px;
   }
   .btn-resume-action {
-    padding: 4px 8px;
-    font-size: 0.74rem;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    padding: 0;
+    font-size: 0.76rem;
   }
   .btn-resume-action span {
     display: none;
   }
-  .resume-modal-title {
-    display: none;
+  .resume-modal-close {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+  }
+  .resume-pdf-container {
+    padding: 8px 6px;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .resume-modal-overlay {
+    padding: max(12px, env(safe-area-inset-top, 12px)) 4px max(12px, env(safe-area-inset-bottom, 12px)) 4px;
+  }
+  .resume-modal-container {
+    height: calc(100vh - 24px);
+    height: calc(100dvh - 24px);
+    max-height: 95vh;
+  }
+  .resume-modal-header {
+    padding: 4px 6px;
+    min-height: 42px;
+    gap: 4px;
+  }
+  .btn-resume-back {
+    padding: 3px 6px;
+    height: 30px;
+    font-size: 0.72rem;
+  }
+  .resume-modal-actions {
+    gap: 4px;
+  }
+  .btn-resume-action {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+  }
+  .resume-modal-close {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
   }
 }
 
