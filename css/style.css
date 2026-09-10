@@ -246,53 +246,62 @@ button, input, textarea, select, .theme-toggle, .theme-palette-btn, .theme-swatc
 
 img { max-width: 100%; height: auto; display: block; }
 
-/* ===== CUSTOM CURSOR (DOT & RING) ===== */
-.cursor-dot {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 7px;
-  height: 7px;
-  background: var(--accent-primary);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 999999;
-  transform: translate(-50%, -50%);
-  transition: width 0.15s, height 0.15s, background-color 0.15s, opacity 0.2s;
-  box-shadow: 0 0 10px var(--accent-glow);
-  opacity: 1;
-}
-
+/* ===== CUSTOM CURSOR (DOT & RING — PC ONLY) ===== */
+.cursor-dot,
 .cursor-ring {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 36px;
-  height: 36px;
-  border: 2px solid rgba(108, 99, 255, 0.6);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 999998;
-  transform: translate(-50%, -50%);
-  transition: width 0.25s var(--transition-spring),
-              height 0.25s var(--transition-spring),
-              border-color 0.25s,
-              background-color 0.25s,
-              opacity 0.2s;
-  opacity: 1;
+  display: none !important;
 }
 
-body.cursor-hover .cursor-dot {
-  width: 12px;
-  height: 12px;
-  background: var(--accent-secondary);
-}
+@media (min-width: 769px) and (hover: hover) and (pointer: fine) {
+  .cursor-dot {
+    display: block !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 7px;
+    height: 7px;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 999999;
+    transform: translate(-50%, -50%);
+    transition: width 0.15s, height 0.15s, background-color 0.15s, opacity 0.2s;
+    box-shadow: 0 0 10px var(--accent-glow);
+    opacity: 0;
+  }
 
-body.cursor-hover .cursor-ring {
-  width: 52px;
-  height: 52px;
-  border-color: var(--accent-secondary);
-  background: rgba(0, 212, 255, 0.1);
+  .cursor-ring {
+    display: block !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 36px;
+    height: 36px;
+    border: 2px solid rgba(108, 99, 255, 0.6);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 999998;
+    transform: translate(-50%, -50%);
+    transition: width 0.25s var(--transition-spring),
+                height 0.25s var(--transition-spring),
+                border-color 0.25s,
+                background-color 0.25s,
+                opacity 0.2s;
+    opacity: 0;
+  }
+
+  body.cursor-hover .cursor-dot {
+    width: 12px;
+    height: 12px;
+    background: var(--accent-secondary);
+  }
+
+  body.cursor-hover .cursor-ring {
+    width: 52px;
+    height: 52px;
+    border-color: var(--accent-secondary);
+    background: rgba(0, 212, 255, 0.1);
+  }
 }
 
 /* Ensure natural cursor inside the resume viewer / iframes so pointer is always available */
@@ -307,17 +316,6 @@ body.cursor-hover .cursor-ring {
 .btn-resume-action,
 .resume-modal-close {
   cursor: pointer !important;
-}
-
-/* Completely disable custom cursor on mobile / touch devices */
-@media (hover: none) and (pointer: coarse), (max-width: 768px) {
-  .cursor-dot,
-  .cursor-ring {
-    display: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-  }
 }
 
 /* ===== LAYOUT ===== */

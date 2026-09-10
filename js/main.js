@@ -10,9 +10,12 @@
   /* ===== CUSTOM CURSOR (DOT & RING — PC ONLY) ===== */
   const cursorDot = document.getElementById('cursorDot');
   const cursorRing = document.getElementById('cursorRing');
-  const isFinePointer = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches && window.innerWidth > 768;
+  const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 768) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
 
-  if (cursorDot && cursorRing && isFinePointer) {
+  if (isTouchDevice) {
+    if (cursorDot) cursorDot.remove();
+    if (cursorRing) cursorRing.remove();
+  } else if (cursorDot && cursorRing) {
     let mouseX = -100, mouseY = -100;
     let ringX = -100, ringY = -100;
 
@@ -45,9 +48,6 @@
       el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
       el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
     });
-  } else if (cursorDot && cursorRing) {
-    cursorDot.style.display = 'none';
-    cursorRing.style.display = 'none';
   }
 
   /* ===== NAVBAR SCROLL EFFECT ===== */
