@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Saksham Dhumale — Portfolio</title>
+  <meta name="description" content="Portfolio of Saksham Dhumale — Software Engineer, Data Analyst, and Machine Learning Enthusiast. Explore projects, skills, and experience." />
+  <meta name="keywords" content="Saksham Dhumale, Software Engineer, Data Analyst, Machine Learning, Portfolio" />
+  <meta property="og:title" content="Saksham Dhumale — Portfolio" />
+  <meta property="og:description" content="Software Engineer | Data Analyst | Machine Learning Enthusiast" />
+  <meta property="og:type" content="website" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+  <!-- Devicon — Technology Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.16.0/devicon.min.css" />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Custom Cursor -->
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#hero" class="nav-logo">SD<span class="logo-dot">.</span></a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#about" class="nav-link">About</a></li>
+        <li><a href="#skills" class="nav-link">Skills</a></li>
+        <li><a href="#projects" class="nav-link">Projects</a></li>
+        <li><a href="#experience" class="nav-link">Experience</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+      </ul>
+      <div class="nav-actions">
+        <!-- Dark/Light Mode Toggle -->
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode">
+          <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <!-- Theme Palette Picker -->
+        <div class="theme-picker" id="themePicker">
+          <button class="theme-palette-btn" id="themePaletteBtn" aria-label="Choose theme" aria-expanded="false">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="0.5" fill="currentColor"/><circle cx="17.5" cy="10.5" r="0.5" fill="currentColor"/><circle cx="8.5" cy="7.5" r="0.5" fill="currentColor"/><circle cx="6.5" cy="12.5" r="0.5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+          </button>
+          <div class="theme-dropdown" id="themeDropdown" role="listbox" aria-label="Theme options">
+            <span class="theme-dropdown-label">Choose Theme</span>
+            <div class="theme-swatches">
+              <button class="theme-swatch" data-palette="cyber" aria-label="Cyber theme" role="option" title="Cyber — Purple &amp; Blue">
+                <span class="swatch-dot" style="background: linear-gradient(135deg,#6c63ff,#00d4ff)"></span>
+                <span class="swatch-name">Cyber</span>
+              </button>
+              <button class="theme-swatch" data-palette="matrix" aria-label="Matrix theme" role="option" title="Matrix — Hacker Green">
+                <span class="swatch-dot" style="background: linear-gradient(135deg,#00ff41,#00cc33)"></span>
+                <span class="swatch-name">Matrix</span>
+              </button>
+              <button class="theme-swatch" data-palette="synthwave" aria-label="Synthwave theme" role="option" title="Synthwave — Retro Pink">
+                <span class="swatch-dot" style="background: linear-gradient(135deg,#ff2d78,#bf5af2)"></span>
+                <span class="swatch-name">Synthwave</span>
+              </button>
+              <button class="theme-swatch" data-palette="ocean" aria-label="Ocean theme" role="option" title="Ocean — Deep Teal">
+                <span class="swatch-dot" style="background: linear-gradient(135deg,#00b4d8,#0077b6)"></span>
+                <span class="swatch-name">Ocean</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========== HERO ========== -->
+  <section class="hero" id="hero">
+    <canvas id="particleCanvas"></canvas>
+    <div class="hero-content">
+      <p class="hero-greeting reveal-up">Hello, I'm</p>
+      <h1 class="hero-name reveal-up">Saksham <span class="accent">Dhumale</span></h1>
+      <p class="hero-title">
+        <span class="typewriter-prefix">I'm a </span>
+        <span class="typewriter" id="typewriter"></span>
+        <span class="typewriter-cursor">|</span>
+      </p>
+      <p class="hero-subtitle reveal-up">Turning data into insights, ideas into code, and problems into solutions.</p>
+      <div class="hero-cta reveal-up">
+        <a href="#projects" class="btn btn-primary">
+          <span>View My Work</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <a href="#contact" class="btn btn-outline">Get In Touch</a>
+      </div>
+      <div class="hero-scroll-indicator">
+        <div class="scroll-mouse">
+          <div class="scroll-wheel"></div>
+        </div>
+        <span>Scroll Down</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== ABOUT ========== -->
+  <section class="section about" id="about">
+    <div class="container">
+      <h2 class="section-title reveal-up">About <span class="accent">Me</span></h2>
+      <div class="section-line reveal-up"></div>
+      <div class="about-grid">
+        <div class="about-avatar reveal-left">
+          <div class="avatar-frame">
+            <div class="avatar-placeholder">
+              <img src="images/profile.jpg" alt="Saksham Dhumale" />
+            </div>
+            <div class="avatar-orbit"></div>
+          </div>
+        </div>
+        <div class="about-text reveal-right">
+          <p class="about-intro">
+            I'm a <strong>Computer Science Engineering</strong> student at Prof. Ram Meghe Institute of Technology & Research, passionate about building intelligent systems and deriving meaningful insights from data.
+          </p>
+          <p>
+            My expertise spans across <strong>Full-Stack Web Development</strong> with Flask, <strong>Machine Learning & Computer Vision</strong> using TensorFlow and OpenCV, and <strong>Data Analysis</strong> with SQL, Python, and PowerBI. I thrive on solving real-world problems through technology.
+          </p>
+          <p>
+            When I'm not coding, you'll find me exploring new ML research papers, contributing to open-source projects, or diving into data visualization challenges.
+          </p>
+          <div class="about-stats">
+            <div class="stat-item reveal-up">
+              <span class="stat-number" data-target="5">0</span><span class="stat-suffix">+</span>
+              <span class="stat-label">Projects</span>
+            </div>
+            <div class="stat-item reveal-up">
+              <span class="stat-number" data-target="10">0</span><span class="stat-suffix">+</span>
+              <span class="stat-label">Technologies</span>
+            </div>
+            <div class="stat-item reveal-up">
+              <span class="stat-number" data-target="4">0</span>
+              <span class="stat-label">Years of Study</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SKILLS ========== -->
+  <section class="section skills" id="skills">
+    <div class="container">
+      <h2 class="section-title reveal-up">Skills & <span class="accent">Tech Stack</span></h2>
+      <div class="section-line reveal-up"></div>
+
+      <div class="skills-grid">
+        <!-- Programming Languages -->
+        <div class="skill-category reveal-up">
+          <div class="skill-category-header">
+            <div class="skill-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </div>
+            <h3>Programming</h3>
+          </div>
+          <div class="skill-items">
+            <div class="skill-item">
+              <i class="devicon-python-plain"></i>
+              <span>Python</span>
+            </div>
+            <div class="skill-item">
+              <i class="devicon-java-plain"></i>
+              <span>Java</span>
+            </div>
+            <div class="skill-item">
+              <i class="devicon-azuresqldatabase-plain"></i>
+              <span>SQL</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ML & Computer Vision -->
+        <div class="skill-category reveal-up">
+          <div class="skill-category-header">
+            <div class="skill-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 0-4 4v1H6a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h1v1a4 4 0 0 0 8 0v-1h1a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2V6a4 4 0 0 0-4-4z"/></svg>
+            </div>
+            <h3>ML & Computer Vision</h3>
+          </div>
+          <div class="skill-items">
+            <div class="skill-item">
+              <i class="devicon-tensorflow-original"></i>
+              <span>TensorFlow</span>
+            </div>
+            <div class="skill-item">
+              <i class="devicon-opencv-plain"></i>
+              <span>OpenCV</span>
+            </div>
+            <div class="skill-item">
+              <i class="devicon-pytorch-plain"></i>
+              <span>CNN</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data & Databases -->
+        <div class="skill-category reveal-up">
+          <div class="skill-category-header">
+            <div class="skill-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+            </div>
+            <h3>Data & Databases</h3>
+          </div>
+          <div class="skill-items">
+            <div class="skill-item">
+              <i class="devicon-mysql-plain"></i>
+              <span>MySQL</span>
+            </div>
+            <div class="skill-item">
+              <i class="devicon-plotly-plain"></i>
+              <span>PowerBI</span>
+            </div>
+            <div class="skill-item">
+              <i class="devicon-sqlite-plain"></i>
+              <span>SQLite</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Web Development -->
+        <div class="skill-category reveal-up">
+          <div class="skill-category-header">
+            <div class="skill-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <h3>Web Development</h3>
+          </div>
+          <div class="skill-items">
+            <div class="skill-item">
+              <i class="devicon-flask-original"></i>
+              <span>Flask</span>
+            </div>
+            <div class="skill-item">
+              <i class="devicon-html5-plain"></i>
+              <span>HTML/CSS</span>
+            </div>
+            <div class="skill-item">
+              <i class="devicon-javascript-plain"></i>
+              <span>JavaScript</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tech Tags -->
+      <div class="tech-tags reveal-up">
+        <span class="tech-tag">Python</span>
+        <span class="tech-tag">Java</span>
+        <span class="tech-tag">Flask</span>
+        <span class="tech-tag">TensorFlow</span>
+        <span class="tech-tag">OpenCV</span>
+        <span class="tech-tag">CNN</span>
+        <span class="tech-tag">MySQL</span>
+        <span class="tech-tag">SQLite</span>
+        <span class="tech-tag">PowerBI</span>
+        <span class="tech-tag">Git</span>
+        <span class="tech-tag">REST APIs</span>
+        <span class="tech-tag">Data Visualization</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== PROJECTS ========== -->
+  <section class="section projects" id="projects">
+    <div class="container">
+      <h2 class="section-title reveal-up">Featured <span class="accent">Projects</span></h2>
+      <div class="section-line reveal-up"></div>
+
+      <div class="projects-grid">
+        <a href="https://github.com/SAKSHAMRD8528/endometrium-cancer-detection" target="_blank" rel="noopener" class="project-card reveal-up" id="project-1">
+          <div class="project-card-inner">
+            <div class="project-visual">
+              <div class="project-visual-bg" style="--accent-1: #6c63ff; --accent-2: #00d4ff;">
+                <div class="project-icon-large">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                </div>
+              </div>
+            </div>
+            <div class="project-info">
+              <div class="project-tags">
+                <span class="project-tag">Flask</span>
+                <span class="project-tag">CNN</span>
+                <span class="project-tag">OpenCV</span>
+                <span class="project-tag">TensorFlow</span>
+              </div>
+              <h3 class="project-title">Endometrium Cancer Detection</h3>
+              <p class="project-desc">
+                An intelligent medical imaging system that leverages Convolutional Neural Networks to detect and classify endometrial cancer from histopathological images. Built with Flask for a seamless web interface, integrating OpenCV for image preprocessing and TensorFlow for deep learning inference.
+              </p>
+              <span class="project-cta">View on GitHub →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Project 2: Pizza Sales Analysis -->
+        <a href="#" class="project-card reveal-up" id="project-2">
+          <div class="project-card-inner">
+            <div class="project-visual">
+              <div class="project-visual-bg" style="--accent-1: #ff6b6b; --accent-2: #ffa726;">
+                <div class="project-icon-large">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                </div>
+              </div>
+            </div>
+            <div class="project-info">
+              <div class="project-tags">
+                <span class="project-tag">MySQL</span>
+                <span class="project-tag">Python</span>
+                <span class="project-tag">Data Visualization</span>
+              </div>
+              <h3 class="project-title">Pizza Sales Analysis</h3>
+              <p class="project-desc">
+                A comprehensive data analysis project dissecting pizza sales data using MySQL for complex querying and Python for interactive visualizations. Uncovered key business insights including peak sales periods, best-selling categories, revenue trends, and customer ordering patterns to drive data-driven decisions.
+              </p>
+              <span class="project-cta">View on GitHub →</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== EXPERIENCE / EDUCATION TIMELINE ========== -->
+  <section class="section experience" id="experience">
+    <div class="container">
+      <h2 class="section-title reveal-up">Education & <span class="accent">Journey</span></h2>
+      <div class="section-line reveal-up"></div>
+
+      <div class="timeline">
+        <div class="timeline-connector" id="timelineConnector"></div>
+
+        <div class="timeline-item reveal-left" data-year="2022 — 2026">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card glass-card">
+            <span class="timeline-badge">B.E. in CSE</span>
+            <h3>Prof. Ram Meghe Institute of Technology & Research</h3>
+            <p class="timeline-location">Badnera, Amravati</p>
+            <p>Pursuing Bachelor of Engineering in Computer Science & Engineering. Focused on Machine Learning, Computer Vision, and Full-Stack Development.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item reveal-right" data-year="2021 — 2022">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card glass-card">
+            <span class="timeline-badge">HSC (12th)</span>
+            <h3>Higher Secondary Education</h3>
+            <p class="timeline-location">Maharashtra State Board</p>
+            <p>Completed Higher Secondary Certificate with focus on Science stream, building a strong foundation in mathematics and physics.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item reveal-left" data-year="2019 — 2020">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card glass-card">
+            <span class="timeline-badge">SSC (10th)</span>
+            <h3>Secondary School Education</h3>
+            <p class="timeline-location">Maharashtra State Board</p>
+            <p>Completed Secondary School Certificate, sparking an early interest in technology and problem-solving.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== TESTIMONIALS ========== -->
+  <section class="section testimonials" id="testimonials">
+    <div class="container">
+      <h2 class="section-title reveal-up">What People <span class="accent">Say</span></h2>
+      <div class="section-line reveal-up"></div>
+
+      <div class="testimonial-slider reveal-up">
+        <div class="testimonial-track" id="testimonialTrack">
+          <div class="testimonial-card glass-card">
+            <div class="testimonial-quote">"</div>
+            <p>Saksham's ability to integrate machine learning models into practical web applications is impressive. His cancer detection project demonstrated both technical depth and real-world impact.</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">P</div>
+              <div>
+                <strong>Prof. Guide</strong>
+                <span>Project Mentor</span>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card glass-card">
+            <div class="testimonial-quote">"</div>
+            <p>A brilliant team player with a sharp analytical mindset. Saksham's data analysis skills helped us uncover insights we hadn't considered. He always goes the extra mile.</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">T</div>
+              <div>
+                <strong>Team Colleague</strong>
+                <span>CSE Department</span>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card glass-card">
+            <div class="testimonial-quote">"</div>
+            <p>His passion for continuous learning and dedication to solving complex problems makes him stand out. Saksham consistently brings innovative solutions to the table.</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">A</div>
+              <div>
+                <strong>Academic Peer</strong>
+                <span>Fellow Student</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-nav">
+          <button class="test-nav-btn" id="testPrev" aria-label="Previous testimonial">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="test-dots" id="testDots"></div>
+          <button class="test-nav-btn" id="testNext" aria-label="Next testimonial">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CONTACT ========== -->
+  <section class="section contact" id="contact">
+    <div class="container">
+      <h2 class="section-title reveal-up">Get In <span class="accent">Touch</span></h2>
+      <div class="section-line reveal-up"></div>
+
+      <div class="contact-grid">
+        <div class="contact-info reveal-left">
+          <p class="contact-intro">Have an idea, a project, or just want to say hello? I'd love to hear from you. Let's build something amazing together.</p>
+
+          <div class="contact-details">
+            <a href="mailto:sakshamrd852@gmail.com" class="contact-detail-item">
+              <div class="contact-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <div>
+                <strong>Email</strong>
+                <span>sakshamrd852@gmail.com</span>
+              </div>
+            </a>
+            <a href="tel:+919422446157" class="contact-detail-item">
+              <div class="contact-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </div>
+              <div>
+                <strong>Phone</strong>
+                <span>+91 9422446157</span>
+              </div>
+            </a>
+            <div class="contact-detail-item">
+              <div class="contact-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div>
+                <strong>Location</strong>
+                <span>Pune, Maharashtra, India</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="social-links">
+            <a href="https://github.com/SAKSHAMRD8528" target="_blank" rel="noopener" class="social-link" aria-label="GitHub Profile">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </a>
+            <a href="https://linkedin.com/" target="_blank" rel="noopener" class="social-link" aria-label="LinkedIn Profile">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <form class="contact-form glass-card reveal-right" id="contactForm">
+          <div class="form-group">
+            <input type="text" id="formName" name="name" required autocomplete="name" />
+            <label for="formName">Your Name</label>
+            <div class="form-line"></div>
+          </div>
+          <div class="form-group">
+            <input type="email" id="formEmail" name="email" required autocomplete="email" />
+            <label for="formEmail">Your Email</label>
+            <div class="form-line"></div>
+          </div>
+          <div class="form-group">
+            <input type="text" id="formSubject" name="subject" required />
+            <label for="formSubject">Subject</label>
+            <div class="form-line"></div>
+          </div>
+          <div class="form-group">
+            <textarea id="formMessage" name="message" rows="4" required></textarea>
+            <label for="formMessage">Your Message</label>
+            <div class="form-line"></div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-submit">
+            <span>Send Message</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p class="footer-logo">SD<span class="accent">.</span></p>
+        <p class="footer-text">Designed & Built by <strong>Saksham Dhumale</strong></p>
+        <p class="footer-copy">&copy; 2026 All rights reserved.</p>
+      </div>
+      <button class="back-to-top" id="backToTop" aria-label="Back to top">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+      </button>
+    </div>
+  </footer>
+
+  <script src="js/particles.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
