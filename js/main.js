@@ -468,11 +468,27 @@
   /* ===== RESUME MODAL VIEWER ===== */
   const resumeModal = document.getElementById('resumeModal');
   const closeResumeModal = document.getElementById('closeResumeModal');
+  const backResumeBtn = document.getElementById('backResumeBtn');
+  const backResumeBtnText = document.getElementById('backResumeBtnText');
   const resumeBackdrop = document.getElementById('resumeModalBackdrop');
   const resumeTriggers = document.querySelectorAll('[data-open-resume]');
 
-  function openResume(e) {
-    if (e) e.preventDefault();
+  let resumeOpenedFrom = null;
+
+  function openResume(e, source) {
+    if (e && e.preventDefault) e.preventDefault();
+    resumeOpenedFrom = source || null;
+
+    if (backResumeBtn && backResumeBtnText) {
+      if (resumeOpenedFrom === 'terminal') {
+        backResumeBtnText.textContent = 'Terminal';
+        backResumeBtn.setAttribute('title', 'Return to Terminal');
+      } else {
+        backResumeBtnText.textContent = 'Back';
+        backResumeBtn.setAttribute('title', 'Close Resume');
+      }
+    }
+
     if (resumeModal) {
       resumeModal.classList.add('active');
       resumeModal.setAttribute('aria-hidden', 'false');
@@ -485,6 +501,15 @@
       resumeModal.classList.remove('active');
       resumeModal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
+
+      if (resumeOpenedFrom === 'terminal') {
+        resumeOpenedFrom = null;
+        setTimeout(() => {
+          if (typeof window.openTerminalModal === 'function') {
+            window.openTerminalModal();
+          }
+        }, 150);
+      }
     }
   }
 
@@ -492,9 +517,10 @@
   window.closeResumeModal = closeResume;
 
   resumeTriggers.forEach(btn => {
-    btn.addEventListener('click', openResume);
+    btn.addEventListener('click', (e) => openResume(e, null));
   });
 
+  if (backResumeBtn) backResumeBtn.addEventListener('click', closeResume);
   if (closeResumeModal) closeResumeModal.addEventListener('click', closeResume);
   if (resumeBackdrop) resumeBackdrop.addEventListener('click', closeResume);
 

@@ -143,13 +143,13 @@
           closeTerminalModalFn();
           setTimeout(() => {
             if (typeof window.openResumeModal === 'function') {
-              window.openResumeModal();
+              window.openResumeModal(null, 'terminal');
             } else {
               const modal = document.getElementById('resumeModal');
               if (modal) modal.classList.add('active');
             }
           }, 200);
-          return `<div class="term-line term-green">📄 Opening Resume Modal...</div>`;
+          return `<div class="term-line term-green">📄 Opening Resume Modal... (Click Back / Close to return)</div>`;
         }
       },
 
