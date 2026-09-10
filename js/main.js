@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const cursorDot = document.getElementById('cursorDot');
   const cursorRing = document.getElementById('cursorRing');
 
-  if (cursorDot && cursorRing && window.matchMedia('(pointer: fine)').matches) {
+  if (cursorDot && cursorRing) {
     let mouseX = -100, mouseY = -100;
     let ringX = -100, ringY = -100;
 
@@ -29,8 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function animateRing() {
-      ringX += (mouseX - ringX) * 0.18;
-      ringY += (mouseY - ringY) * 0.18;
+      ringX += (mouseX - ringX) * 0.2;
+      ringY += (mouseY - ringY) * 0.2;
       cursorRing.style.left = ringX + 'px';
       cursorRing.style.top = ringY + 'px';
       requestAnimationFrame(animateRing);
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     animateRing();
 
     // Hover effect on interactive elements
-    const hoverTargets = document.querySelectorAll('a, button, .project-card, .tech-tag, .skill-category, .timeline-card, .term-pill');
+    const hoverTargets = document.querySelectorAll('a, button, .project-card, .tech-tag, .skill-category, .timeline-card, .term-pill, .nav-terminal-btn');
     hoverTargets.forEach(el => {
       el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
       el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));

@@ -259,9 +259,9 @@ img { max-width: 100%; height: auto; display: block; }
   pointer-events: none;
   z-index: 999999;
   transform: translate(-50%, -50%);
-  transition: width 0.15s, height 0.15s, background-color 0.15s, opacity 0.3s;
+  transition: width 0.15s, height 0.15s, background-color 0.15s, opacity 0.2s;
   box-shadow: 0 0 10px var(--accent-glow);
-  opacity: 0;
+  opacity: 1;
 }
 
 .cursor-ring {
@@ -270,17 +270,17 @@ img { max-width: 100%; height: auto; display: block; }
   left: 0;
   width: 36px;
   height: 36px;
-  border: 2px solid rgba(108, 99, 255, 0.5);
+  border: 2px solid rgba(108, 99, 255, 0.6);
   border-radius: 50%;
   pointer-events: none;
   z-index: 999998;
   transform: translate(-50%, -50%);
-  transition: width 0.3s var(--transition-spring),
-              height 0.3s var(--transition-spring),
-              border-color 0.3s,
-              background-color 0.3s,
-              opacity 0.3s;
-  opacity: 0;
+  transition: width 0.25s var(--transition-spring),
+              height 0.25s var(--transition-spring),
+              border-color 0.25s,
+              background-color 0.25s,
+              opacity 0.2s;
+  opacity: 1;
 }
 
 body.cursor-hover .cursor-dot {
@@ -293,10 +293,10 @@ body.cursor-hover .cursor-ring {
   width: 52px;
   height: 52px;
   border-color: var(--accent-secondary);
-  background: rgba(0, 212, 255, 0.08);
+  background: rgba(0, 212, 255, 0.1);
 }
 
-/* Ensure natural cursor when inside the resume viewer / iframes so pointer never disappears */
+/* Ensure natural cursor inside the resume viewer / iframes so pointer is always available */
 .resume-modal-overlay.active,
 .resume-modal-overlay.active *,
 .resume-iframe {
@@ -308,11 +308,6 @@ body.cursor-hover .cursor-ring {
 .btn-resume-action,
 .resume-modal-close {
   cursor: pointer !important;
-}
-
-@media (pointer: coarse) {
-  .cursor-dot, .cursor-ring { display: none !important; }
-  body, a, button { cursor: auto !important; }
 }
 
 /* ===== LAYOUT ===== */
