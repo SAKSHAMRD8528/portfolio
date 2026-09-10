@@ -461,8 +461,6 @@
   /* ===== RESUME MODAL VIEWER WITH PDF.JS RENDERING ===== */
   const resumeModal = document.getElementById('resumeModal');
   const closeResumeModal = document.getElementById('closeResumeModal');
-  const backResumeBtn = document.getElementById('backResumeBtn');
-  const backResumeBtnText = document.getElementById('backResumeBtnText');
   const resumeBackdrop = document.getElementById('resumeModalBackdrop');
   const resumeTriggers = document.querySelectorAll('[data-open-resume]');
   const resumePdfContainer = document.getElementById('resumePdfContainer');
@@ -516,16 +514,6 @@
     if (e && e.preventDefault) e.preventDefault();
     resumeOpenedFrom = source || null;
 
-    if (backResumeBtn && backResumeBtnText) {
-      if (resumeOpenedFrom === 'terminal') {
-        backResumeBtnText.textContent = 'Terminal';
-        backResumeBtn.setAttribute('title', 'Return to Terminal');
-      } else {
-        backResumeBtnText.textContent = 'Back';
-        backResumeBtn.setAttribute('title', 'Close Resume');
-      }
-    }
-
     if (resumeModal) {
       resumeModal.classList.add('active');
       resumeModal.setAttribute('aria-hidden', 'false');
@@ -558,7 +546,6 @@
     btn.addEventListener('click', (e) => openResume(e, null));
   });
 
-  if (backResumeBtn) backResumeBtn.addEventListener('click', closeResume);
   if (closeResumeModal) closeResumeModal.addEventListener('click', closeResume);
   if (resumeBackdrop) resumeBackdrop.addEventListener('click', closeResume);
 
