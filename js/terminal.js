@@ -1,12 +1,12 @@
 /* ============================================
-   TERMINAL.JS — Simplified Interactive CLI Modal
+   TERMINAL.JS — Interactive CLI Modal
    ============================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
   const terminalModal = document.getElementById('terminalModal');
   const termModalBackdrop = document.getElementById('terminalModalBackdrop');
   const closeTermBtns = document.querySelectorAll('#closeTerminalBtn, #closeTerminalIconBtn');
-  const openTermTriggers = document.querySelectorAll('[data-open-terminal], #navTerminalBtn');
+  const openTermTriggers = document.querySelectorAll('[data-open-terminal], #navTerminalBtn, #heroTerminalBtn');
 
   const terminalWindow = document.getElementById('embeddedTerminal');
   const termOutput = document.getElementById('terminalOutput');
@@ -78,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
   <tr><td><span class="cmd-highlight">resume</span></td><td>Open master resume preview</td></tr>
   <tr><td><span class="cmd-highlight">contact</span></td><td>Email, LinkedIn & GitHub</td></tr>
   <tr><td><span class="cmd-highlight">dino</span></td><td>Play Chrome Dino runner 🦖</td></tr>
+  <tr><td><span class="cmd-highlight">space</span></td><td>Play Space Blaster arcade 🚀</td></tr>
   <tr><td><span class="cmd-highlight">theme &lt;name&gt;</span></td><td>cyber, matrix, synthwave, ocean</td></tr>
   <tr><td><span class="cmd-highlight">clear</span></td><td>Clear terminal screen</td></tr>
   <tr><td><span class="cmd-highlight">exit</span></td><td>Close terminal</td></tr>
@@ -155,15 +156,41 @@ document.addEventListener('DOMContentLoaded', () => {
         closeTerminalModal();
         setTimeout(() => {
           if (typeof window.openGameModal === 'function') {
-            window.openGameModal();
+            window.openGameModal('dino');
           }
         }, 200);
         return `<div class="term-line term-green">🦖 Launching Chrome Dino Runner... Press Space to Jump!</div>`;
+      }
+    },
+
+    space: {
+      desc: 'Launch Space Blaster arcade mini-game',
+      exec: () => {
+        closeTerminalModal();
+        setTimeout(() => {
+          if (typeof window.openGameModal === 'function') {
+            window.openGameModal('space');
+          }
+        }, 200);
+        return `<div class="term-line term-green">🚀 Launching Space Blaster Arcade... Fire away!</div>`;
+      }
+    },
+
+    blaster: {
+      desc: 'Launch Space Blaster arcade mini-game',
+      exec: () => {
+        closeTerminalModal();
+        setTimeout(() => {
+          if (typeof window.openGameModal === 'function') {
+            window.openGameModal('space');
+          }
+        }, 200);
+        return `<div class="term-line term-green">🚀 Launching Space Blaster Arcade... Fire away!</div>`;
       }
     },
 
     game: {
-      desc: 'Launch Chrome Dino runner mini-game',
+      desc: 'Launch Arcade Game Center',
       exec: () => {
         closeTerminalModal();
         setTimeout(() => {
@@ -171,12 +198,25 @@ document.addEventListener('DOMContentLoaded', () => {
             window.openGameModal();
           }
         }, 200);
-        return `<div class="term-line term-green">🦖 Launching Chrome Dino Runner... Press Space to Jump!</div>`;
+        return `<div class="term-line term-green">🎮 Opening Arcade Game Center... Choose Dino or Space!</div>`;
+      }
+    },
+
+    arcade: {
+      desc: 'Launch Arcade Game Center',
+      exec: () => {
+        closeTerminalModal();
+        setTimeout(() => {
+          if (typeof window.openGameModal === 'function') {
+            window.openGameModal();
+          }
+        }, 200);
+        return `<div class="term-line term-green">🎮 Opening Arcade Game Center... Choose Dino or Space!</div>`;
       }
     },
 
     play: {
-      desc: 'Launch Chrome Dino runner mini-game',
+      desc: 'Launch Arcade Game Center',
       exec: () => {
         closeTerminalModal();
         setTimeout(() => {
@@ -184,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.openGameModal();
           }
         }, 200);
-        return `<div class="term-line term-green">🦖 Launching Chrome Dino Runner... Press Space to Jump!</div>`;
+        return `<div class="term-line term-green">🎮 Opening Arcade Game Center... Choose Dino or Space!</div>`;
       }
     },
 
@@ -339,6 +379,6 @@ document.addEventListener('DOMContentLoaded', () => {
   termOutput.innerHTML = `
 <div class="term-welcome">
   <span class="term-cyan">⚡ Saksham's Portfolio Terminal</span>
-  <br/><span class="term-dim">Type <span class="cmd-highlight">help</span> or click quick pills below. Type <span class="cmd-highlight">dino</span> to play 🦖</span>
+  <br/><span class="term-dim">Type <span class="cmd-highlight">help</span> or click quick pills below. Play <span class="cmd-highlight">dino</span> 🦖 or <span class="cmd-highlight">space</span> 🚀</span>
 </div>`;
 });
