@@ -221,7 +221,6 @@ body {
   color: var(--text-primary);
   line-height: 1.7;
   overflow-x: hidden;
-  cursor: none;
   transition: background-color var(--transition-slow), color var(--transition-slow);
 }
 
@@ -233,6 +232,7 @@ body {
 a {
   color: var(--accent-secondary);
   text-decoration: none;
+  cursor: pointer;
   transition: color var(--transition-fast);
 }
 
@@ -241,54 +241,6 @@ a:hover {
 }
 
 img { max-width: 100%; height: auto; display: block; }
-
-/* ===== CUSTOM CURSOR ===== */
-.cursor-dot {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 6px;
-  height: 6px;
-  background: var(--accent-primary);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 10000;
-  transform: translate(-50%, -50%);
-  transition: width 0.15s, height 0.15s, background 0.15s;
-}
-
-.cursor-ring {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 36px;
-  height: 36px;
-  border: 2px solid rgba(108, 99, 255, 0.5);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 10000;
-  transform: translate(-50%, -50%);
-  transition: width 0.3s var(--transition-spring),
-              height 0.3s var(--transition-spring),
-              border-color 0.3s;
-}
-
-body.cursor-hover .cursor-dot {
-  width: 12px;
-  height: 12px;
-  background: var(--accent-secondary);
-}
-
-body.cursor-hover .cursor-ring {
-  width: 50px;
-  height: 50px;
-  border-color: var(--accent-secondary);
-}
-
-@media (pointer: coarse) {
-  .cursor-dot, .cursor-ring { display: none; }
-  body { cursor: auto; }
-}
 
 /* ===== LAYOUT ===== */
 .container {
@@ -441,7 +393,7 @@ body.cursor-hover .cursor-ring {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: none;
+  cursor: pointer;
   color: var(--text-secondary);
   transition: all var(--transition-fast);
 }
@@ -483,7 +435,7 @@ body.cursor-hover .cursor-ring {
   border: 2px solid var(--border-color);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
-  cursor: none;
+  cursor: pointer;
   transition: all var(--transition-fast);
 }
 
@@ -542,7 +494,7 @@ body.cursor-hover .cursor-ring {
   background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  cursor: none;
+  cursor: pointer;
   transition: all var(--transition-fast);
   width: 100%;
 }
@@ -586,7 +538,7 @@ body.cursor-hover .cursor-ring {
   gap: 5px;
   background: none;
   border: none;
-  cursor: none;
+  cursor: pointer;
   padding: 8px;
   z-index: 1001;
 }
@@ -710,7 +662,7 @@ body.cursor-hover .cursor-ring {
   font-size: 0.95rem;
   font-weight: 600;
   letter-spacing: 0.3px;
-  cursor: none;
+  cursor: pointer;
   transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
@@ -1337,7 +1289,7 @@ body.cursor-hover .cursor-ring {
   align-items: center;
   justify-content: center;
   color: var(--text-secondary);
-  cursor: none;
+  cursor: pointer;
   transition: all var(--transition-fast);
 }
 
@@ -1356,7 +1308,7 @@ body.cursor-hover .cursor-ring {
   height: 10px;
   border-radius: 50%;
   background: var(--border-color);
-  cursor: none;
+  cursor: pointer;
   transition: all var(--transition-fast);
 }
 
@@ -1565,7 +1517,7 @@ a.contact-detail-item:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: none;
+  cursor: pointer;
   transition: all var(--transition-base);
   box-shadow: 0 4px 20px var(--accent-glow);
   opacity: 0;
@@ -1892,9 +1844,7 @@ body.theme-matrix .accent {
   text-shadow: 0 0 15px rgba(0, 255, 65, 0.7);
 }
 
-/* Cursor */
-body.theme-matrix .cursor-dot { background: #00ff41 !important; }
-body.theme-matrix .cursor-ring { border-color: rgba(0, 255, 65, 0.6) !important; }
+
 
 /* Timeline dot */
 body.theme-matrix .timeline-dot {

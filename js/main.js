@@ -4,37 +4,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  /* ===== CUSTOM CURSOR ===== */
-  const cursorDot = document.getElementById('cursorDot');
-  const cursorRing = document.getElementById('cursorRing');
 
-  if (cursorDot && cursorRing && window.matchMedia('(pointer: fine)').matches) {
-    let mouseX = 0, mouseY = 0;
-    let ringX = 0, ringY = 0;
-
-    document.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      cursorDot.style.left = mouseX + 'px';
-      cursorDot.style.top = mouseY + 'px';
-    });
-
-    function animateRing() {
-      ringX += (mouseX - ringX) * 0.15;
-      ringY += (mouseY - ringY) * 0.15;
-      cursorRing.style.left = ringX + 'px';
-      cursorRing.style.top = ringY + 'px';
-      requestAnimationFrame(animateRing);
-    }
-    animateRing();
-
-    // Hover effect on interactive elements
-    const hoverTargets = document.querySelectorAll('a, button, .project-card, .tech-tag, .skill-category, .timeline-card');
-    hoverTargets.forEach(el => {
-      el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-      el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-    });
-  }
 
   /* ===== NAVBAR SCROLL EFFECT ===== */
   const navbar = document.getElementById('navbar');
