@@ -221,6 +221,7 @@ body {
   color: var(--text-primary);
   line-height: 1.7;
   overflow-x: hidden;
+  cursor: none;
   transition: background-color var(--transition-slow), color var(--transition-slow);
 }
 
@@ -232,7 +233,7 @@ body {
 a {
   color: var(--accent-secondary);
   text-decoration: none;
-  cursor: pointer;
+  cursor: none;
   transition: color var(--transition-fast);
 }
 
@@ -240,7 +241,79 @@ a:hover {
   color: var(--accent-primary);
 }
 
+button, input, textarea, select, .theme-toggle, .theme-palette-btn, .theme-swatch, .hamburger, .btn, .filter-btn, .test-nav-btn, .test-dot, .back-to-top, .term-pill, .nav-terminal-btn {
+  cursor: none;
+}
+
 img { max-width: 100%; height: auto; display: block; }
+
+/* ===== CUSTOM CURSOR (DOT & RING) ===== */
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  background: var(--accent-primary);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 999999;
+  transform: translate(-50%, -50%);
+  transition: width 0.15s, height 0.15s, background-color 0.15s, opacity 0.3s;
+  box-shadow: 0 0 10px var(--accent-glow);
+  opacity: 0;
+}
+
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 36px;
+  height: 36px;
+  border: 2px solid rgba(108, 99, 255, 0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 999998;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s var(--transition-spring),
+              height 0.3s var(--transition-spring),
+              border-color 0.3s,
+              background-color 0.3s,
+              opacity 0.3s;
+  opacity: 0;
+}
+
+body.cursor-hover .cursor-dot {
+  width: 12px;
+  height: 12px;
+  background: var(--accent-secondary);
+}
+
+body.cursor-hover .cursor-ring {
+  width: 52px;
+  height: 52px;
+  border-color: var(--accent-secondary);
+  background: rgba(0, 212, 255, 0.08);
+}
+
+/* Ensure natural cursor when inside the resume viewer / iframes so pointer never disappears */
+.resume-modal-overlay.active,
+.resume-modal-overlay.active *,
+.resume-iframe {
+  cursor: auto !important;
+}
+
+.resume-modal-overlay.active a,
+.resume-modal-overlay.active button,
+.btn-resume-action,
+.resume-modal-close {
+  cursor: pointer !important;
+}
+
+@media (pointer: coarse) {
+  .cursor-dot, .cursor-ring { display: none !important; }
+  body, a, button { cursor: auto !important; }
+}
 
 /* ===== LAYOUT ===== */
 .container {
@@ -1861,9 +1934,9 @@ body.theme-matrix .accent {
   text-shadow: 0 0 15px rgba(0, 255, 65, 0.7);
 }
 
-
-
-/* Timeline dot */
+/* Cursor */
+body.theme-matrix .cursor-dot { background: #00ff41 !important; box-shadow: 0 0 10px #00ff41 !important; }
+body.theme-matrix .cursor-ring { border-color: rgba(0, 255, 65, 0.6) !important; }
 body.theme-matrix .timeline-dot {
   background: #00ff41 !important;
   box-shadow: 0 0 0 3px #00ff41, 0 0 20px rgba(0, 255, 65, 0.6) !important;
