@@ -60,11 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (type === 'laser') {
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(880, now);
-        osc.frequency.exponentialRampToValueAtTime(110, now + 0.12);
+        osc.frequency.exponentialRampToValueAtTime(110, now + 0.1);
         gain.gain.setValueAtTime(0.12, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
         osc.start(now);
-        osc.stop(now + 0.12);
+        osc.stop(now + 0.1);
       } else if (type === 'score') {
         osc.type = 'square';
         osc.frequency.setValueAtTime(659.25, now);
@@ -78,15 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
         osc.frequency.setValueAtTime(160, now);
         osc.frequency.exponentialRampToValueAtTime(30, now + 0.25);
         gain.gain.setValueAtTime(0.3, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
-        osc.start(now);
-        osc.stop(now + 0.25);
-      } else if (type === 'powerup') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(440, now);
-        osc.frequency.setValueAtTime(660, now + 0.08);
-        osc.frequency.setValueAtTime(880, now + 0.16);
-        gain.gain.setValueAtTime(0.15, now);
         gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
         osc.start(now);
         osc.stop(now + 0.25);
@@ -105,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = canvas.parentElement;
     if (container) {
       width = Math.min(container.clientWidth - 4, 700);
-      height = currentGame === 'dino' ? 240 : 360;
+      height = currentGame === 'dino' ? 240 : 340;
       GROUND_Y = height - 35;
       canvas.width = width;
       canvas.height = height;
@@ -197,11 +188,11 @@ document.addEventListener('DOMContentLoaded', () => {
       obsHeight = 24;
       const altType = Math.random();
       if (altType < 0.35) {
-        obsY = GROUND_Y - 24; // Low (jump over)
+        obsY = GROUND_Y - 24;
       } else if (altType < 0.7) {
-        obsY = GROUND_Y - 52; // Mid (duck under)
+        obsY = GROUND_Y - 52;
       } else {
-        obsY = GROUND_Y - 80; // High (fly over)
+        obsY = GROUND_Y - 80;
       }
     } else if (rand > 0.45) {
       type = 'tall_cactus';
@@ -470,15 +461,14 @@ document.addEventListener('DOMContentLoaded', () => {
   let spaceParticles = [];
   let spaceStars = [];
   let spaceLastShot = 0;
+  let spaceInvulnerableTimer = 0;
 
   const player = {
     x: 320,
-    y: 310,
-    width: 26,
-    height: 26,
-    speed: 6.5,
-    powerup: 'normal',
-    powerupTimer: 0
+    y: 290,
+    width: 28,
+    height: 28,
+    speed: 7.5
   };
 
   const spaceKeys = {
@@ -493,20 +483,24 @@ document.addEventListener('DOMContentLoaded', () => {
     spaceLasers = [];
     spaceEnemies = [];
     spaceParticles = [];
+    spaceInvulnerableTimer = 0;
     player.x = width / 2;
     player.y = height - 40;
-    player.powerup = 'normal';
-    player.powerupTimer = 0;
 
     spaceStars = [];
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 60; i++) {
       spaceStars.push({
         x: Math.random() * width,
         y: Math.random() * height,
         size: Math.random() * 2 + 0.5,
-        speed: Math.random() * 1.5 + 0.5,
+        speed: Math.random() * 1.8 + 0.6,
         color: ['#ffffff', '#6c63ff', '#00d4ff', '#ff2d78'][Math.floor(Math.random() * 4)]
       });
+    }
+
+    // Spawn 2 initial enemies immediately so action begins right away
+    for (let i = 0; i < 2; i++) {
+      spawnSpaceEnemy(Math.random() * -100 - 20);
     }
 
     updateSpaceLivesHUD();
@@ -519,40 +513,37 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function fireSpaceLaser() {
+    if (!isRunning || isGameOver) return;
     const now = Date.now();
-    if (now - spaceLastShot < 180) return;
+    if (now - spaceLastShot < 140) return;
     spaceLastShot = now;
 
-    if (player.powerup === 'triple') {
-      spaceLasers.push({ x: player.x, y: player.y - 12, vx: 0, vy: -9 });
-      spaceLasers.push({ x: player.x - 8, y: player.y - 10, vx: -2, vy: -8.5 });
-      spaceLasers.push({ x: player.x + 8, y: player.y - 10, vx: 2, vy: -8.5 });
-    } else {
-      spaceLasers.push({ x: player.x, y: player.y - 12, vx: 0, vy: -9 });
-    }
+    // Dual plasma cannons
+    spaceLasers.push({ x: player.x - 7, y: player.y - 14, vx: 0, vy: -10 });
+    spaceLasers.push({ x: player.x + 7, y: player.y - 14, vx: 0, vy: -10 });
     playSound('laser');
   }
 
-  function spawnSpaceEnemy() {
+  function spawnSpaceEnemy(customY) {
     const types = ['invader', 'asteroid', 'cruiser'];
     const type = types[Math.floor(Math.random() * types.length)];
     const size = type === 'asteroid' ? 24 : 20;
 
     spaceEnemies.push({
       type,
-      x: Math.random() * (width - 40) + 20,
-      y: -25,
+      x: Math.random() * (width - 60) + 30,
+      y: customY !== undefined ? customY : -25,
       size,
-      speed: Math.random() * 1.8 + 1.8,
+      speed: Math.random() * 1.5 + 2.0,
       hp: type === 'cruiser' ? 2 : 1,
       color: type === 'invader' ? '#ff2d78' : type === 'asteroid' ? '#8b949e' : '#ffbd2e'
     });
   }
 
   function createExplosion(x, y, color) {
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 14; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 4 + 1;
+      const speed = Math.random() * 4.5 + 1.2;
       spaceParticles.push({
         x, y,
         vx: Math.cos(angle) * speed,
@@ -584,33 +575,41 @@ document.addEventListener('DOMContentLoaded', () => {
     if (spaceKeys.fire) fireSpaceLaser();
 
     player.x = Math.max(player.width / 2, Math.min(width - player.width / 2, player.x));
+    player.y = height - 40;
 
-    // Render Player Ship
-    ctx.fillStyle = '#00d4ff';
-    ctx.beginPath();
-    ctx.moveTo(player.x, player.y - 14);
-    ctx.lineTo(player.x - 12, player.y + 12);
-    ctx.lineTo(player.x, player.y + 6);
-    ctx.lineTo(player.x + 12, player.y + 12);
-    ctx.closePath();
-    ctx.fill();
+    if (spaceInvulnerableTimer > 0) spaceInvulnerableTimer--;
 
-    // Thruster flame
-    ctx.fillStyle = Math.random() > 0.5 ? '#ff2d78' : '#ffbd2e';
-    ctx.fillRect(player.x - 3, player.y + 8, 6, Math.random() * 8 + 4);
+    // Render Player Ship (with flicker if invulnerable)
+    if (spaceInvulnerableTimer % 4 < 2) {
+      ctx.fillStyle = '#00d4ff';
+      ctx.beginPath();
+      ctx.moveTo(player.x, player.y - 14);
+      ctx.lineTo(player.x - 14, player.y + 12);
+      ctx.lineTo(player.x, player.y + 6);
+      ctx.lineTo(player.x + 14, player.y + 12);
+      ctx.closePath();
+      ctx.fill();
+
+      // Cockpit
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(player.x - 2, player.y - 4, 4, 6);
+
+      // Thruster flame
+      ctx.fillStyle = Math.random() > 0.5 ? '#ff2d78' : '#ffbd2e';
+      ctx.fillRect(player.x - 3, player.y + 8, 6, Math.random() * 8 + 4);
+    }
 
     // Lasers
     ctx.fillStyle = '#00ff41';
     for (let i = spaceLasers.length - 1; i >= 0; i--) {
       const l = spaceLasers[i];
-      l.x += l.vx;
       l.y += l.vy;
-      ctx.fillRect(l.x - 2, l.y, 4, 10);
+      ctx.fillRect(l.x - 2, l.y, 4, 12);
       if (l.y < -15) spaceLasers.splice(i, 1);
     }
 
     // Spawn Enemies
-    if (Math.random() < 0.035) spawnSpaceEnemy();
+    if (Math.random() < 0.038) spawnSpaceEnemy();
 
     // Update Enemies
     for (let i = spaceEnemies.length - 1; i >= 0; i--) {
@@ -629,27 +628,30 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fill();
       } else {
         ctx.beginPath();
-        ctx.moveTo(e.x, e.y + 10);
-        ctx.lineTo(e.x - 10, e.y - 10);
-        ctx.lineTo(e.x + 10, e.y - 10);
+        ctx.moveTo(e.x, e.y + 12);
+        ctx.lineTo(e.x - 12, e.y - 10);
+        ctx.lineTo(e.x + 12, e.y - 10);
         ctx.closePath();
         ctx.fill();
       }
 
       // Check collision with player
-      const distToPlayer = Math.hypot(player.x - e.x, player.y - e.y);
-      if (distToPlayer < 20) {
-        createExplosion(e.x, e.y, '#ff2d78');
-        spaceEnemies.splice(i, 1);
-        spaceLives--;
-        updateSpaceLivesHUD();
-        playSound('hit');
+      if (spaceInvulnerableTimer <= 0) {
+        const distToPlayer = Math.hypot(player.x - e.x, player.y - e.y);
+        if (distToPlayer < 22) {
+          createExplosion(e.x, e.y, '#ff2d78');
+          spaceEnemies.splice(i, 1);
+          spaceLives--;
+          spaceInvulnerableTimer = 45; // 0.75s grace period
+          updateSpaceLivesHUD();
+          playSound('hit');
 
-        if (spaceLives <= 0) {
-          handleGameOver(spaceScore, spaceHighScore, 'spaceBlasterHighScore');
-          return;
+          if (spaceLives <= 0) {
+            handleGameOver(spaceScore, spaceHighScore, 'spaceBlasterHighScore');
+            return;
+          }
+          continue;
         }
-        continue;
       }
 
       // Check collision with lasers
@@ -746,7 +748,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tabDino.classList.add('active');
         tabSpace.classList.remove('active');
         if (livesWrapper) livesWrapper.style.display = 'none';
-        if (dinoControls) dinoControls.style.display = '';
+        if (dinoControls) dinoControls.style.display = 'flex';
         if (spaceControls) spaceControls.style.display = 'none';
         if (instructionsEl) instructionsEl.innerHTML = '<span>⌨️ <strong>Space</strong> / <strong>↑</strong> to Jump | <strong>↓</strong> to Duck | Tap Screen</span>';
       } else {
@@ -754,8 +756,8 @@ document.addEventListener('DOMContentLoaded', () => {
         tabDino.classList.remove('active');
         if (livesWrapper) livesWrapper.style.display = 'flex';
         if (dinoControls) dinoControls.style.display = 'none';
-        if (spaceControls) spaceControls.style.display = '';
-        if (instructionsEl) instructionsEl.innerHTML = '<span>⌨️ <strong>← →</strong> / <strong>A D</strong> to Move | <strong>Space</strong> / Click to Fire</span>';
+        if (spaceControls) spaceControls.style.display = 'flex';
+        if (instructionsEl) instructionsEl.innerHTML = '<span>⌨️ <strong>← →</strong> / <strong>A D</strong> or Mouse Drag | <strong>Space</strong> / Click to Fire</span>';
       }
     }
 
@@ -826,8 +828,14 @@ document.addEventListener('DOMContentLoaded', () => {
           dinoDuck(true);
         }
       } else {
-        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') spaceKeys.left = true;
-        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') spaceKeys.right = true;
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+          e.preventDefault();
+          spaceKeys.left = true;
+        }
+        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+          e.preventDefault();
+          spaceKeys.right = true;
+        }
         if (e.code === 'Space') {
           e.preventDefault();
           if (isGameOver) {
@@ -859,12 +867,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentGame === 'dino') {
       dinoJump();
     } else {
-      fireSpaceLaser();
+      if (isGameOver) {
+        resetActiveGame();
+        animationFrameId = requestAnimationFrame(gameLoop);
+      } else {
+        fireSpaceLaser();
+      }
     }
   });
 
   canvas.addEventListener('mousemove', (e) => {
-    if (currentGame === 'space' && isRunning) {
+    if (currentGame === 'space' && isRunning && !isGameOver) {
       const rect = canvas.getBoundingClientRect();
       player.x = Math.max(player.width / 2, Math.min(width - player.width / 2, e.clientX - rect.left));
     }
@@ -874,8 +887,28 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentGame === 'dino') {
       e.preventDefault();
       dinoJump();
+    } else {
+      if (isGameOver) {
+        resetActiveGame();
+        animationFrameId = requestAnimationFrame(gameLoop);
+      } else {
+        const rect = canvas.getBoundingClientRect();
+        if (e.touches && e.touches[0]) {
+          player.x = Math.max(player.width / 2, Math.min(width - player.width / 2, e.touches[0].clientX - rect.left));
+        }
+        fireSpaceLaser();
+      }
     }
   }, { passive: false });
+
+  canvas.addEventListener('touchmove', (e) => {
+    if (currentGame === 'space' && isRunning && !isGameOver) {
+      const rect = canvas.getBoundingClientRect();
+      if (e.touches && e.touches[0]) {
+        player.x = Math.max(player.width / 2, Math.min(width - player.width / 2, e.touches[0].clientX - rect.left));
+      }
+    }
+  }, { passive: true });
 
   // Touch button binds
   if (touchJumpBtn) {
