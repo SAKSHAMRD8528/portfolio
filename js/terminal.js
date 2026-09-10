@@ -1,16 +1,67 @@
 /* ============================================
-   TERMINAL.JS — Embedded Interactive CLI Shell
+   TERMINAL.JS — Popup Interactive CLI Modal
    ============================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
+  const terminalModal = document.getElementById('terminalModal');
+  const termModalBackdrop = document.getElementById('terminalModalBackdrop');
+  const closeTermBtns = document.querySelectorAll('#closeTerminalBtn, #closeTerminalIconBtn');
+  const openTermTriggers = document.querySelectorAll('[data-open-terminal], #navTerminalBtn, #heroTerminalBtn');
+
   const terminalWindow = document.getElementById('embeddedTerminal');
   const termOutput = document.getElementById('terminalOutput');
   const termInput = document.getElementById('terminalInput');
-  const termPromptLine = document.getElementById('terminalPromptLine');
   const termQuickPills = document.querySelectorAll('.term-pill');
   const termCanvas = document.getElementById('terminalMatrixCanvas');
 
   if (!termOutput || !termInput) return;
+
+  // Terminal Modal Open / Close Logic
+  function openTerminalModal() {
+    if (!terminalModal) return;
+    terminalModal.classList.add('active');
+    terminalModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+      if (termInput) termInput.focus();
+    }, 100);
+  }
+
+  function closeTerminalModal() {
+    if (!terminalModal) return;
+    terminalModal.classList.remove('active');
+    terminalModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  // Expose globally
+  window.openTerminalModal = openTerminalModal;
+  window.closeTerminalModal = closeTerminalModal;
+
+  openTermTriggers.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openTerminalModal();
+    });
+  });
+
+  closeTermBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeTerminalModal();
+    });
+  });
+
+  if (termModalBackdrop) {
+    termModalBackdrop.addEventListener('click', closeTerminalModal);
+  }
+
+  // Keyboard shortcut: Escape closes modal
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && terminalModal && terminalModal.classList.contains('active')) {
+      closeTerminalModal();
+    }
+  });
 
   let commandHistory = [];
   let historyIndex = -1;
@@ -34,6 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
   <tr><td><span class="cmd-highlight">quote</span></td><td>Display an inspiring software/AI quote</td></tr>
   <tr><td><span class="cmd-highlight">whoami</span></td><td>Display current user status</td></tr>
   <tr><td><span class="cmd-highlight">clear</span></td><td>Clear terminal screen output</td></tr>
+  <tr><td><span class="cmd-highlight">exit</span></td><td>Close the terminal window</td></tr>
 </table>
 <div class="term-hint">💡 Tip: Use <kbd>Tab</kbd> to autocomplete and <kbd>↑</kbd> <kbd>↓</kbd> to cycle history.</div>`
     },
@@ -97,6 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
     resume: {
       desc: 'Open resume viewer modal',
       exec: () => {
+        closeTerminalModal();
         setTimeout(() => {
           if (typeof window.openResumeModal === 'function') {
             window.openResumeModal();
@@ -144,6 +197,14 @@ document.addEventListener('DOMContentLoaded', () => {
     date: {
       desc: 'Show current timestamp',
       exec: () => `<div class="term-line">${new Date().toLocaleString()}</div>`
+    },
+
+    exit: {
+      desc: 'Close terminal modal',
+      exec: () => {
+        setTimeout(closeTerminalModal, 300);
+        return `<div class="term-line term-dim">Closing terminal session... Goodbye!</div>`;
+      }
     },
 
     clear: {
@@ -344,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial welcome message
   termOutput.innerHTML = `
 <div class="term-welcome">
-  <span class="term-cyan">Saksham Dhumale Interactive Terminal</span> [Version 2.4.0-release]
-  <br/><span class="term-dim">Type <span class="cmd-highlight">help</span> or click the quick command chips to begin exploring.</span>
+  <span class="term-cyan">Saksham Dhumale Interactive Terminal</span> [v2.4.0]
+  <br/><span class="term-dim">Type <span class="cmd-highlight">help</span> or click quick pills below. Type <span class="cmd-highlight">exit</span> or press <kbd>ESC</kbd> to close.</span>
 </div>`;
 });

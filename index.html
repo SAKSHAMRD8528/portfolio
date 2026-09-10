@@ -18,7 +18,7 @@
   <!-- Devicon — Technology Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.16.0/devicon.min.css" />
 
-  <link rel="stylesheet" href="css/style.css?v=5.3" />
+  <link rel="stylesheet" href="css/style.css?v=6.0" />
 </head>
 <body>
 
@@ -31,10 +31,10 @@
       <ul class="nav-links" id="navLinks">
         <li><a href="#about" class="nav-link">About</a></li>
         <li><a href="#skills" class="nav-link">Skills</a></li>
-        <li><a href="#terminal" class="nav-link"><span class="terminal-nav-icon">&gt;_</span> Terminal</a></li>
         <li><a href="#projects" class="nav-link">Projects</a></li>
         <li><a href="#experience" class="nav-link">Experience</a></li>
         <li><a href="#contact" class="nav-link">Contact</a></li>
+        <li><button class="nav-link nav-terminal-btn" id="navTerminalBtn" data-open-terminal="true" aria-label="Open Terminal"><span class="terminal-nav-icon">&gt;_</span> Terminal</button></li>
         <li><a href="Saksham_Dhumale_Master_Resume.pdf" class="nav-link nav-resume-link" data-open-resume="true">Resume 👁</a></li>
       </ul>
       <div class="nav-actions">
@@ -94,10 +94,10 @@
           <span>View My Work</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
-        <a href="#terminal" class="btn btn-outline btn-hero-terminal">
+        <button class="btn btn-outline btn-hero-terminal" id="heroTerminalBtn" data-open-terminal="true">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-          <span>&gt;_ Terminal</span>
-        </a>
+          <span>&gt;_ Open Terminal</span>
+        </button>
         <a href="Saksham_Dhumale_Master_Resume.pdf" class="btn btn-outline" id="heroResumeBtn" data-open-resume="true">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
           <span>View Resume</span>
@@ -283,62 +283,7 @@
     </div>
   </section>
 
-  <!-- ========== DEVELOPER TERMINAL ========== -->
-  <section class="section terminal-section" id="terminal">
-    <div class="container">
-      <h2 class="section-title reveal-up">Developer <span class="accent">Terminal</span></h2>
-      <div class="section-line reveal-up"></div>
-      <p class="section-subtitle reveal-up">An interactive CLI environment to explore my technical skills, projects, background, and features.</p>
 
-      <div class="terminal-wrapper reveal-up">
-        <!-- Terminal Window Frame -->
-        <div class="terminal-card" id="embeddedTerminal">
-          <div class="terminal-header">
-            <div class="terminal-traffic-lights">
-              <span class="traffic-light red" title="Close"></span>
-              <span class="traffic-light yellow" title="Minimize"></span>
-              <span class="traffic-light green" title="Maximize"></span>
-            </div>
-            <div class="terminal-title">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-              <span>saksham@portfolio: ~ (bash)</span>
-            </div>
-            <div class="terminal-header-status">
-              <span class="status-indicator"></span>
-              <span>LIVE</span>
-            </div>
-          </div>
-
-          <!-- Optional Matrix Canvas Overlay -->
-          <canvas id="terminalMatrixCanvas" class="terminal-matrix-canvas"></canvas>
-
-          <div class="terminal-body" id="terminalOutput">
-            <!-- Populated dynamically by JS -->
-          </div>
-
-          <!-- Prompt Line -->
-          <div class="terminal-prompt-line" id="terminalPromptLine">
-            <span class="term-user">saksham@portfolio</span>:<span class="term-path">~</span>$&nbsp;
-            <input type="text" id="terminalInput" class="terminal-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="type 'help' or click a command below..." aria-label="Terminal Command Input" />
-          </div>
-        </div>
-
-        <!-- Quick Command Pills -->
-        <div class="terminal-quick-pills">
-          <span class="pills-label">Quick Commands:</span>
-          <button class="term-pill" data-cmd="help"><span class="pill-dot"></span>help</button>
-          <button class="term-pill" data-cmd="skills"><span class="pill-dot"></span>skills</button>
-          <button class="term-pill" data-cmd="projects"><span class="pill-dot"></span>projects</button>
-          <button class="term-pill" data-cmd="about"><span class="pill-dot"></span>about</button>
-          <button class="term-pill" data-cmd="resume"><span class="pill-dot"></span>resume</button>
-          <button class="term-pill" data-cmd="contact"><span class="pill-dot"></span>contact</button>
-          <button class="term-pill" data-cmd="matrix"><span class="pill-dot"></span>matrix</button>
-          <button class="term-pill" data-cmd="quote"><span class="pill-dot"></span>quote</button>
-          <button class="term-pill" data-cmd="clear"><span class="pill-dot"></span>clear</button>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- ========== PROJECTS ========== -->
   <section class="section projects" id="projects">
@@ -619,8 +564,60 @@
     </div>
   </div>
 
+  <!-- ========== DEVELOPER TERMINAL POPUP MODAL ========== -->
+  <div class="terminal-modal-overlay" id="terminalModal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="terminal-modal-backdrop" id="terminalModalBackdrop"></div>
+    <div class="terminal-modal-container">
+      <div class="terminal-card" id="embeddedTerminal">
+        <div class="terminal-header">
+          <div class="terminal-traffic-lights">
+            <button class="traffic-light red" id="closeTerminalBtn" title="Close Terminal"></button>
+            <span class="traffic-light yellow" title="Minimize"></span>
+            <span class="traffic-light green" title="Maximize"></span>
+          </div>
+          <div class="terminal-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            <span>saksham@portfolio: ~ (bash)</span>
+          </div>
+          <div class="terminal-header-actions">
+            <span class="status-indicator"></span>
+            <span class="terminal-live-text">LIVE</span>
+            <button class="term-modal-close-btn" id="closeTerminalIconBtn" aria-label="Close Terminal">✕</button>
+          </div>
+        </div>
+
+        <!-- Optional Matrix Canvas Overlay -->
+        <canvas id="terminalMatrixCanvas" class="terminal-matrix-canvas"></canvas>
+
+        <div class="terminal-body" id="terminalOutput">
+          <!-- Populated dynamically by JS -->
+        </div>
+
+        <!-- Prompt Line -->
+        <div class="terminal-prompt-line" id="terminalPromptLine">
+          <span class="term-user">saksham@portfolio</span>:<span class="term-path">~</span>$&nbsp;
+          <input type="text" id="terminalInput" class="terminal-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="type 'help' or click a command below..." aria-label="Terminal Command Input" />
+        </div>
+
+        <!-- Quick Command Pills -->
+        <div class="terminal-quick-pills">
+          <span class="pills-label">Quick:</span>
+          <button class="term-pill" data-cmd="help"><span class="pill-dot"></span>help</button>
+          <button class="term-pill" data-cmd="skills"><span class="pill-dot"></span>skills</button>
+          <button class="term-pill" data-cmd="projects"><span class="pill-dot"></span>projects</button>
+          <button class="term-pill" data-cmd="about"><span class="pill-dot"></span>about</button>
+          <button class="term-pill" data-cmd="resume"><span class="pill-dot"></span>resume</button>
+          <button class="term-pill" data-cmd="contact"><span class="pill-dot"></span>contact</button>
+          <button class="term-pill" data-cmd="matrix"><span class="pill-dot"></span>matrix</button>
+          <button class="term-pill" data-cmd="quote"><span class="pill-dot"></span>quote</button>
+          <button class="term-pill" data-cmd="clear"><span class="pill-dot"></span>clear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="js/particles.js"></script>
-  <script src="js/main.js?v=6.1"></script>
-  <script src="js/terminal.js?v=1.0"></script>
+  <script src="js/main.js?v=6.2"></script>
+  <script src="js/terminal.js?v=2.0"></script>
 </body>
 </html>
