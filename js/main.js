@@ -219,31 +219,6 @@
   const timelineConnector = document.getElementById('timelineConnector');
   const timeline = document.querySelector('.timeline');
 
-  // Reversible Scroll Reveal Observer
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('revealed');
-      } else {
-        // Reverse animation when element scrolls out of view
-        entry.target.classList.remove('revealed');
-      }
-    });
-  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-
-  revealElements.forEach(el => revealObserver.observe(el));
-
-  // Initial check for elements in viewport
-  setTimeout(() => {
-    revealElements.forEach(el => {
-      const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight && rect.bottom > 0) {
-        el.classList.add('revealed');
-      }
-    });
-  }, 100);
-
-  // Reversible Animated Counters
   function animateCounter(el, target) {
     let current = 0;
     const duration = 1200;
@@ -261,51 +236,67 @@
     tick();
   }
 
-  const counterObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      const target = parseInt(entry.target.getAttribute('data-target'));
-      if (entry.isIntersecting) {
-        animateCounter(entry.target, target);
+  function checkReveals() {
+    const triggerBottom = window.innerHeight * 0.90;
+
+    revealElements.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      // Reveal when top enters the viewport (and stays revealed if scrolled past above)
+      if (rect.top < triggerBottom) {
+        el.classList.add('revealed');
       } else {
-        entry.target.textContent = '0';
+        // Reverse animation out when element drops below bottom threshold while scrolling up
+        el.classList.remove('revealed');
       }
     });
-  }, { threshold: 0.4 });
 
-  counters.forEach(c => counterObserver.observe(c));
+    // Timeline connector animation
+    if (timelineConnector && timeline) {
+      const tRect = timeline.getBoundingClientRect();
+      if (tRect.top < window.innerHeight * 0.75) {
+        timelineConnector.style.height = '100%';
+      } else {
+        timelineConnector.style.height = '0%';
+      }
+    }
 
-  // Reversible Skill Ring Animation
-  const ringObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      const percent = parseInt(entry.target.getAttribute('data-percent'));
-      const progress = entry.target.querySelector('.ring-progress');
+    // Counters animation
+    counters.forEach(c => {
+      const rect = c.getBoundingClientRect();
+      const target = parseInt(c.getAttribute('data-target'));
+      if (rect.top < triggerBottom && rect.bottom > 0) {
+        if (!c.dataset.counted) {
+          c.dataset.counted = 'true';
+          animateCounter(c, target);
+        }
+      } else if (rect.top >= triggerBottom) {
+        c.dataset.counted = '';
+        c.textContent = '0';
+      }
+    });
+
+    // Skill ring progress animation
+    skillRings.forEach(ring => {
+      const rect = ring.getBoundingClientRect();
+      const percent = parseInt(ring.getAttribute('data-percent'));
+      const progress = ring.querySelector('.ring-progress');
       if (progress && !isNaN(percent)) {
-        if (entry.isIntersecting) {
-          const offset = circumference - (percent / 100) * circumference;
-          progress.style.strokeDashoffset = offset;
-        } else {
+        if (rect.top < triggerBottom && rect.bottom > 0) {
+          progress.style.strokeDashoffset = circumference - (percent / 100) * circumference;
+        } else if (rect.top >= triggerBottom) {
           progress.style.strokeDashoffset = circumference;
         }
       }
     });
-  }, { threshold: 0.3 });
-
-  skillRings.forEach(ring => ringObserver.observe(ring));
-
-  // Reversible Timeline Connector
-  if (timelineConnector && timeline) {
-    const timelineObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          timelineConnector.style.height = '100%';
-        } else {
-          timelineConnector.style.height = '0%';
-        }
-      });
-    }, { threshold: 0.1 });
-
-    timelineObserver.observe(timeline);
   }
+
+  window.addEventListener('scroll', checkReveals, { passive: true });
+  window.addEventListener('resize', checkReveals, { passive: true });
+
+  // Initial check on page load
+  checkReveals();
+  setTimeout(checkReveals, 100);
+  setTimeout(checkReveals, 400);
 
   /* ===== 3D TILT ON PROJECT CARDS ===== */
   const projectCards = document.querySelectorAll('.project-card');
