@@ -376,6 +376,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  window.openResumeModal = openResume;
+  window.closeResumeModal = closeResume;
+
   resumeTriggers.forEach(btn => {
     btn.addEventListener('click', openResume);
   });

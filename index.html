@@ -18,7 +18,7 @@
   <!-- Devicon — Technology Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.16.0/devicon.min.css" />
 
-  <link rel="stylesheet" href="css/style.css?v=5.1" />
+  <link rel="stylesheet" href="css/style.css?v=5.2" />
 </head>
 <body>
 
@@ -31,6 +31,7 @@
       <ul class="nav-links" id="navLinks">
         <li><a href="#about" class="nav-link">About</a></li>
         <li><a href="#skills" class="nav-link">Skills</a></li>
+        <li><a href="#terminal" class="nav-link">Terminal</a></li>
         <li><a href="#projects" class="nav-link">Projects</a></li>
         <li><a href="#experience" class="nav-link">Experience</a></li>
         <li><a href="#contact" class="nav-link">Contact</a></li>
@@ -275,6 +276,63 @@
         <span class="tech-tag">Git</span>
         <span class="tech-tag">REST APIs</span>
         <span class="tech-tag">Data Visualization</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== DEVELOPER TERMINAL ========== -->
+  <section class="section terminal-section" id="terminal">
+    <div class="container">
+      <h2 class="section-title reveal-up">Developer <span class="accent">Terminal</span></h2>
+      <div class="section-line reveal-up"></div>
+      <p class="section-subtitle reveal-up">An interactive CLI environment to explore my technical skills, projects, background, and features.</p>
+
+      <div class="terminal-wrapper reveal-up">
+        <!-- Terminal Window Frame -->
+        <div class="terminal-card" id="embeddedTerminal">
+          <div class="terminal-header">
+            <div class="terminal-traffic-lights">
+              <span class="traffic-light red" title="Close"></span>
+              <span class="traffic-light yellow" title="Minimize"></span>
+              <span class="traffic-light green" title="Maximize"></span>
+            </div>
+            <div class="terminal-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+              <span>saksham@portfolio: ~ (bash)</span>
+            </div>
+            <div class="terminal-header-status">
+              <span class="status-indicator"></span>
+              <span>LIVE</span>
+            </div>
+          </div>
+
+          <!-- Optional Matrix Canvas Overlay -->
+          <canvas id="terminalMatrixCanvas" class="terminal-matrix-canvas"></canvas>
+
+          <div class="terminal-body" id="terminalOutput">
+            <!-- Populated dynamically by JS -->
+          </div>
+
+          <!-- Prompt Line -->
+          <div class="terminal-prompt-line" id="terminalPromptLine">
+            <span class="term-user">saksham@portfolio</span>:<span class="term-path">~</span>$&nbsp;
+            <input type="text" id="terminalInput" class="terminal-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="type 'help' or click a command below..." aria-label="Terminal Command Input" />
+          </div>
+        </div>
+
+        <!-- Quick Command Pills -->
+        <div class="terminal-quick-pills">
+          <span class="pills-label">Quick Commands:</span>
+          <button class="term-pill" data-cmd="help"><span class="pill-dot"></span>help</button>
+          <button class="term-pill" data-cmd="skills"><span class="pill-dot"></span>skills</button>
+          <button class="term-pill" data-cmd="projects"><span class="pill-dot"></span>projects</button>
+          <button class="term-pill" data-cmd="about"><span class="pill-dot"></span>about</button>
+          <button class="term-pill" data-cmd="resume"><span class="pill-dot"></span>resume</button>
+          <button class="term-pill" data-cmd="contact"><span class="pill-dot"></span>contact</button>
+          <button class="term-pill" data-cmd="matrix"><span class="pill-dot"></span>matrix</button>
+          <button class="term-pill" data-cmd="quote"><span class="pill-dot"></span>quote</button>
+          <button class="term-pill" data-cmd="clear"><span class="pill-dot"></span>clear</button>
+        </div>
       </div>
     </div>
   </section>
@@ -559,6 +617,7 @@
   </div>
 
   <script src="js/particles.js"></script>
-  <script src="js/main.js?v=6.0"></script>
+  <script src="js/main.js?v=6.1"></script>
+  <script src="js/terminal.js?v=1.0"></script>
 </body>
 </html>
