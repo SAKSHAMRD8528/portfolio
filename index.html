@@ -18,7 +18,7 @@
   <!-- Devicon — Technology Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.16.0/devicon.min.css" />
 
-  <link rel="stylesheet" href="css/style.css?v=14.0" />
+  <link rel="stylesheet" href="css/style.css?v=15.0" />
 </head>
 <body>
 
@@ -512,10 +512,11 @@
             <label for="formMessage">Your Message</label>
             <div class="form-line"></div>
           </div>
-          <button type="submit" class="btn btn-primary btn-submit">
+          <button type="submit" class="btn btn-primary btn-submit" id="contactSubmitBtn">
             <span>Send Message</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
+          <div class="form-status-msg" id="formStatusMsg" style="display: none;"></div>
         </form>
       </div>
     </div>
@@ -609,13 +610,14 @@
           <button class="term-pill" data-cmd="contact"><span class="pill-dot"></span>contact</button>
           <button class="term-pill" data-cmd="dino"><span class="pill-dot"></span>dino 🦖</button>
           <button class="term-pill" data-cmd="space"><span class="pill-dot"></span>space 🚀</button>
+          <button class="term-pill" data-cmd="snake"><span class="pill-dot"></span>snake 🐍</button>
           <button class="term-pill" data-cmd="clear"><span class="pill-dot"></span>clear</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ========== CYBER ARCADE CENTER MODAL (DINO & SPACE BLASTER) ========== -->
+  <!-- ========== CYBER ARCADE CENTER MODAL (DINO, SPACE BLASTER & SNAKE) ========== -->
   <div class="game-modal-overlay" id="gameModal" aria-hidden="true" role="dialog" aria-modal="true">
     <div class="game-modal-backdrop" id="gameModalBackdrop"></div>
     <div class="game-modal-container">
@@ -630,6 +632,7 @@
           <div class="arcade-tabs" id="arcadeTabs">
             <button class="arcade-tab-btn active" id="tabDino" data-game="dino">🦖 Dino</button>
             <button class="arcade-tab-btn" id="tabSpace" data-game="space">🚀 Space</button>
+            <button class="arcade-tab-btn" id="tabSnake" data-game="snake">🐍 Snake</button>
           </div>
           <div class="game-hud">
             <div class="hud-item" id="hudLivesWrapper" style="display: none;"><span id="gameLives" class="hud-lives">❤️❤️❤️</span></div>
@@ -667,14 +670,20 @@
             <button class="touch-btn fire" id="touchFireBtn">🔥 FIRE</button>
             <button class="touch-btn" id="touchRightBtn">▶ RIGHT</button>
           </div>
+          <div class="game-touch-controls" id="snakeTouchControls" style="display: none;">
+            <button class="touch-btn" id="touchSnakeUp">⬆</button>
+            <button class="touch-btn" id="touchSnakeLeft">◀</button>
+            <button class="touch-btn" id="touchSnakeRight">▶</button>
+            <button class="touch-btn" id="touchSnakeDown">⬇</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <script src="js/particles.js?v=14.0"></script>
-  <script src="js/main.js?v=14.0"></script>
-  <script src="js/terminal.js?v=14.0"></script>
-  <script src="js/game.js?v=14.0"></script>
+  <script src="js/particles.js?v=15.0"></script>
+  <script src="js/main.js?v=15.0"></script>
+  <script src="js/terminal.js?v=15.0"></script>
+  <script src="js/game.js?v=15.0"></script>
 </body>
 </html>

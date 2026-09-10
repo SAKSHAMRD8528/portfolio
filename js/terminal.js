@@ -95,6 +95,7 @@
   <tr><td><span class="cmd-highlight">contact</span></td><td>Email, LinkedIn & GitHub</td></tr>
   <tr><td><span class="cmd-highlight">dino</span></td><td>Play Chrome Dino runner 🦖</td></tr>
   <tr><td><span class="cmd-highlight">space</span></td><td>Play Space Blaster arcade 🚀</td></tr>
+  <tr><td><span class="cmd-highlight">snake</span></td><td>Play Retro Cyber Snake 🐍</td></tr>
   <tr><td><span class="cmd-highlight">theme &lt;name&gt;</span></td><td>cyber, matrix, synthwave, ocean</td></tr>
   <tr><td><span class="cmd-highlight">clear</span></td><td>Clear terminal screen</td></tr>
   <tr><td><span class="cmd-highlight">exit</span></td><td>Close terminal</td></tr>
@@ -126,16 +127,12 @@
         exec: () => `
 <div class="term-res-header">🚀 Featured Projects:</div>
 <div class="term-proj-item">
-  <div class="term-proj-title">1. <strong class="term-cyan">Chest X-Ray Pneumonia Detection</strong> <span class="term-badge">94.2% Acc</span></div>
-  <div class="term-proj-desc">CNN deep learning model with OpenCV preprocessing & Grad-CAM visualization.</div>
+  <div class="term-proj-title">1. <strong class="term-cyan">Endometrium Cancer Detection</strong> <span class="term-badge">CNN / OpenCV</span></div>
+  <div class="term-proj-desc">Histopathological image classifier built with Flask and TensorFlow.</div>
 </div>
 <div class="term-proj-item">
-  <div class="term-proj-title">2. <strong class="term-cyan">House Price Prediction Model</strong></div>
-  <div class="term-proj-desc">End-to-end regression pipeline with feature engineering and Ridge/Lasso models.</div>
-</div>
-<div class="term-proj-item">
-  <div class="term-proj-title">3. <strong class="term-cyan">IPL Match Win Predictor</strong></div>
-  <div class="term-proj-desc">Real-time match win predictor trained on 10+ years of delivery data with Flask UI.</div>
+  <div class="term-proj-title">2. <strong class="term-cyan">Pizza Sales Analysis</strong> <span class="term-badge">MySQL / PowerBI</span></div>
+  <div class="term-proj-desc">Business intelligence and sales trend dashboard.</div>
 </div>
 <div class="term-proj-link">🔗 <a href="https://github.com/SAKSHAMRD8528" target="_blank">View all repositories on GitHub ↗</a></div>`
       },
@@ -189,6 +186,19 @@
             }
           }, 150);
           return `<div class="term-line term-green">🚀 Launching Space Blaster Arcade... Fire away!</div>`;
+        }
+      },
+
+      snake: {
+        desc: 'Launch Retro Cyber Snake mini-game',
+        exec: () => {
+          closeTerminalModalFn();
+          setTimeout(() => {
+            if (typeof window.openGameModal === 'function') {
+              window.openGameModal('snake');
+            }
+          }, 150);
+          return `<div class="term-line term-green">🐍 Launching Cyber Snake... Use Arrow Keys to navigate!</div>`;
         }
       },
 

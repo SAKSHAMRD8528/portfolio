@@ -28,6 +28,7 @@
 
     const tabDino = document.getElementById('tabDino');
     const tabSpace = document.getElementById('tabSpace');
+    const tabSnake = document.getElementById('tabSnake');
 
     const scoreEl = document.getElementById('gameScore');
     const highScoreEl = document.getElementById('gameHighScore');
@@ -40,6 +41,7 @@
 
     const dinoControls = document.getElementById('dinoTouchControls');
     const spaceControls = document.getElementById('spaceTouchControls');
+    const snakeControls = document.getElementById('snakeTouchControls');
 
     const touchDuckBtn = document.getElementById('touchDuckBtn');
     const touchJumpBtn = document.getElementById('touchJumpBtn');
@@ -47,7 +49,12 @@
     const touchRightBtn = document.getElementById('touchRightBtn');
     const touchFireBtn = document.getElementById('touchFireBtn');
 
-    let currentGame = 'dino'; // 'dino' | 'space'
+    const touchSnakeUp = document.getElementById('touchSnakeUp');
+    const touchSnakeDown = document.getElementById('touchSnakeDown');
+    const touchSnakeLeft = document.getElementById('touchSnakeLeft');
+    const touchSnakeRight = document.getElementById('touchSnakeRight');
+
+    let currentGame = 'dino'; // 'dino' | 'space' | 'snake'
     let animationFrameId = null;
     let isRunning = false;
     let isGameOver = false;
@@ -97,6 +104,22 @@
           gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
           osc.start(now);
           osc.stop(now + 0.25);
+        } else if (type === 'eat') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.exponentialRampToValueAtTime(1046.5, now + 0.08);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else if (type === 'powerup') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(330, now);
+          osc.frequency.exponentialRampToValueAtTime(1320, now + 0.2);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+          osc.start(now);
+          osc.stop(now + 0.2);
         }
       } catch (e) {
         // Audio fallback
@@ -117,7 +140,7 @@
         containerWidth = Math.min(window.innerWidth - 30, 680);
       }
       width = Math.max(300, Math.min(containerWidth - 4, 700));
-      height = currentGame === 'dino' ? 240 : 340;
+      height = currentGame === 'dino' ? 240 : currentGame === 'space' ? 340 : 320;
       GROUND_Y = height - 35;
       canvas.width = width;
       canvas.height = height;
@@ -703,6 +726,238 @@
       }
     }
 
+    /* ==========================================
+       GAME 3: RETRO CYBER SNAKE 🐍
+       ========================================== */
+    const GRID_SIZE = 16;
+    let snakeScore = 0;
+    let snakeHighScore = parseInt(localStorage.getItem('cyberSnakeHighScore') || '0', 10);
+    let snakeBody = [];
+    let snakeDir = { x: 1, y: 0 };
+    let snakeNextDir = { x: 1, y: 0 };
+    let snakeFood = { x: 8, y: 8, type: 'normal' };
+    let snakeSpecialFood = null;
+    let snakeLastMove = 0;
+    let snakeSpeed = 100;
+    let snakeParticles = [];
+
+    function initSnake() {
+      snakeScore = 0;
+      snakeDir = { x: 1, y: 0 };
+      snakeNextDir = { x: 1, y: 0 };
+      snakeSpeed = 100;
+      snakeLastMove = performance.now();
+      snakeParticles = [];
+
+      const startX = Math.floor((width / GRID_SIZE) / 2);
+      const startY = Math.floor((height / GRID_SIZE) / 2);
+      snakeBody = [
+        { x: startX, y: startY },
+        { x: startX - 1, y: startY },
+        { x: startX - 2, y: startY }
+      ];
+
+      spawnSnakeFood();
+      snakeSpecialFood = null;
+    }
+
+    function spawnSnakeFood() {
+      const cols = Math.floor(width / GRID_SIZE);
+      const rows = Math.floor(height / GRID_SIZE);
+      let valid = false;
+      let newX = 0, newY = 0;
+      let attempts = 0;
+      while (!valid && attempts < 100) {
+        attempts++;
+        newX = Math.floor(Math.random() * (cols - 2)) + 1;
+        newY = Math.floor(Math.random() * (rows - 2)) + 1;
+        valid = !snakeBody.some(seg => seg.x === newX && seg.y === newY);
+      }
+      snakeFood = { x: newX, y: newY, type: 'normal' };
+    }
+
+    function spawnSnakeSpecialFood() {
+      const cols = Math.floor(width / GRID_SIZE);
+      const rows = Math.floor(height / GRID_SIZE);
+      let valid = false;
+      let newX = 0, newY = 0;
+      let attempts = 0;
+      while (!valid && attempts < 100) {
+        attempts++;
+        newX = Math.floor(Math.random() * (cols - 2)) + 1;
+        newY = Math.floor(Math.random() * (rows - 2)) + 1;
+        valid = !snakeBody.some(seg => seg.x === newX && seg.y === newY) && !(snakeFood.x === newX && snakeFood.y === newY);
+      }
+      snakeSpecialFood = { x: newX, y: newY, life: 180 };
+    }
+
+    function createSnakeBurst(x, y, color) {
+      for (let i = 0; i < 14; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 3.5 + 1;
+        snakeParticles.push({
+          x: x * GRID_SIZE + GRID_SIZE / 2,
+          y: y * GRID_SIZE + GRID_SIZE / 2,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          size: Math.random() * 3 + 1.5,
+          color: color || '#00ff41',
+          life: 1
+        });
+      }
+    }
+
+    function changeSnakeDirection(dx, dy) {
+      if (isGameOver || !isRunning) {
+        resetActiveGame();
+        return;
+      }
+      if (snakeDir.x !== 0 && dx === -snakeDir.x) return;
+      if (snakeDir.y !== 0 && dy === -snakeDir.y) return;
+      snakeNextDir = { x: dx, y: dy };
+    }
+
+    function updateAndRenderSnake() {
+      ctx.fillStyle = '#060a12';
+      ctx.fillRect(0, 0, width, height);
+
+      const cols = Math.floor(width / GRID_SIZE);
+      const rows = Math.floor(height / GRID_SIZE);
+
+      // Subtle Cyber Grid lines
+      ctx.strokeStyle = 'rgba(0, 255, 65, 0.05)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < width; x += GRID_SIZE) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += GRID_SIZE) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      if (scoreEl) scoreEl.textContent = String(snakeScore).padStart(5, '0');
+
+      const now = performance.now();
+      if (now - snakeLastMove > snakeSpeed) {
+        snakeLastMove = now;
+        snakeDir = { ...snakeNextDir };
+
+        const head = { x: snakeBody[0].x + snakeDir.x, y: snakeBody[0].y + snakeDir.y };
+
+        // Wall Collision
+        if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows) {
+          handleGameOver(snakeScore, snakeHighScore, 'cyberSnakeHighScore');
+          return;
+        }
+
+        // Self Collision
+        if (snakeBody.some(seg => seg.x === head.x && seg.y === head.y)) {
+          handleGameOver(snakeScore, snakeHighScore, 'cyberSnakeHighScore');
+          return;
+        }
+
+        snakeBody.unshift(head);
+
+        // Check Food
+        if (head.x === snakeFood.x && head.y === snakeFood.y) {
+          snakeScore += 10;
+          playSound('eat');
+          createSnakeBurst(head.x, head.y, '#00ff41');
+          spawnSnakeFood();
+          snakeSpeed = Math.max(55, 100 - Math.floor(snakeScore / 30) * 4);
+
+          if (Math.random() < 0.35 && !snakeSpecialFood) {
+            spawnSnakeSpecialFood();
+          }
+        } else if (snakeSpecialFood && head.x === snakeSpecialFood.x && head.y === snakeSpecialFood.y) {
+          snakeScore += 50;
+          playSound('powerup');
+          createSnakeBurst(head.x, head.y, '#ff2d78');
+          snakeSpecialFood = null;
+        } else {
+          snakeBody.pop();
+        }
+      }
+
+      // Special Food
+      if (snakeSpecialFood) {
+        snakeSpecialFood.life--;
+        if (snakeSpecialFood.life <= 0) {
+          snakeSpecialFood = null;
+        } else {
+          const pX = snakeSpecialFood.x * GRID_SIZE + GRID_SIZE / 2;
+          const pY = snakeSpecialFood.y * GRID_SIZE + GRID_SIZE / 2;
+          const pulse = Math.sin(Date.now() / 120) * 3 + GRID_SIZE / 2 - 2;
+          ctx.fillStyle = '#ff2d78';
+          ctx.beginPath();
+          ctx.arc(pX, pY, Math.max(3, pulse), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(pX - 2, pY - 2, 4, 4);
+        }
+      }
+
+      // Normal Food
+      const fX = snakeFood.x * GRID_SIZE;
+      const fY = snakeFood.y * GRID_SIZE;
+      ctx.fillStyle = '#00ff41';
+      ctx.fillRect(fX + 2, fY + 2, GRID_SIZE - 4, GRID_SIZE - 4);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(fX + 5, fY + 5, GRID_SIZE - 10, GRID_SIZE - 10);
+
+      // Draw Snake Body
+      for (let i = 0; i < snakeBody.length; i++) {
+        const seg = snakeBody[i];
+        const sX = seg.x * GRID_SIZE;
+        const sY = seg.y * GRID_SIZE;
+
+        if (i === 0) {
+          ctx.fillStyle = '#00d4ff';
+          ctx.fillRect(sX + 1, sY + 1, GRID_SIZE - 2, GRID_SIZE - 2);
+
+          ctx.fillStyle = '#ffffff';
+          if (snakeDir.x === 1) {
+            ctx.fillRect(sX + GRID_SIZE - 5, sY + 3, 3, 3);
+            ctx.fillRect(sX + GRID_SIZE - 5, sY + GRID_SIZE - 6, 3, 3);
+          } else if (snakeDir.x === -1) {
+            ctx.fillRect(sX + 2, sY + 3, 3, 3);
+            ctx.fillRect(sX + 2, sY + GRID_SIZE - 6, 3, 3);
+          } else if (snakeDir.y === 1) {
+            ctx.fillRect(sX + 3, sY + GRID_SIZE - 5, 3, 3);
+            ctx.fillRect(sX + GRID_SIZE - 6, sY + GRID_SIZE - 5, 3, 3);
+          } else {
+            ctx.fillRect(sX + 3, sY + 2, 3, 3);
+            ctx.fillRect(sX + GRID_SIZE - 6, sY + 2, 3, 3);
+          }
+        } else {
+          const ratio = i / snakeBody.length;
+          const r = Math.floor(0 + ratio * 120);
+          const g = Math.floor(212 - ratio * 100);
+          const b = Math.floor(255 - ratio * 40);
+          ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+          ctx.fillRect(sX + 2, sY + 2, GRID_SIZE - 4, GRID_SIZE - 4);
+        }
+      }
+
+      // Particles
+      for (let i = snakeParticles.length - 1; i >= 0; i--) {
+        const p = snakeParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.05;
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = Math.max(0, p.life);
+        ctx.fillRect(p.x, p.y, p.size, p.size);
+        ctx.globalAlpha = 1;
+        if (p.life <= 0) snakeParticles.splice(i, 1);
+      }
+    }
+
     // GAME OVER HANDLER
     function handleGameOver(finalScore, currentHigh, storageKey) {
       isRunning = false;
@@ -717,6 +972,7 @@
         localStorage.setItem(storageKey, finalScore);
         if (storageKey === 'chromeDinoHighScore') dinoHighScore = finalScore;
         if (storageKey === 'spaceBlasterHighScore') spaceHighScore = finalScore;
+        if (storageKey === 'cyberSnakeHighScore') snakeHighScore = finalScore;
       }
 
       const effectiveHigh = Math.max(finalScore, currentHigh);
@@ -734,8 +990,10 @@
     function gameLoop() {
       if (currentGame === 'dino') {
         updateAndRenderDino();
-      } else {
+      } else if (currentGame === 'space') {
         updateAndRenderSpace();
+      } else {
+        updateAndRenderSnake();
       }
 
       if (isRunning && !isGameOver) {
@@ -760,9 +1018,12 @@
       if (currentGame === 'dino') {
         initDino();
         if (highScoreEl) highScoreEl.textContent = String(dinoHighScore).padStart(5, '0');
-      } else {
+      } else if (currentGame === 'space') {
         initSpace();
         if (highScoreEl) highScoreEl.textContent = String(spaceHighScore).padStart(5, '0');
+      } else {
+        initSnake();
+        if (highScoreEl) highScoreEl.textContent = String(snakeHighScore).padStart(5, '0');
       }
       startGameLoop();
     }
@@ -770,21 +1031,24 @@
     function switchGame(gameType) {
       currentGame = gameType;
 
-      if (tabDino && tabSpace) {
-        if (gameType === 'dino') {
-          tabDino.classList.add('active');
-          tabSpace.classList.remove('active');
-          if (livesWrapper) livesWrapper.style.display = 'none';
-          if (dinoControls) dinoControls.style.display = 'flex';
-          if (spaceControls) spaceControls.style.display = 'none';
-          if (instructionsEl) instructionsEl.innerHTML = '<span>⌨️ <strong>Space</strong> / <strong>↑</strong> to Jump | <strong>↓</strong> to Duck | Tap Screen</span>';
-        } else {
-          tabSpace.classList.add('active');
-          tabDino.classList.remove('active');
-          if (livesWrapper) livesWrapper.style.display = 'flex';
-          if (dinoControls) dinoControls.style.display = 'none';
-          if (spaceControls) spaceControls.style.display = 'flex';
-          if (instructionsEl) instructionsEl.innerHTML = '<span>⌨️ <strong>← →</strong> / <strong>A D</strong> or Mouse Drag | <strong>Space</strong> / Click to Fire</span>';
+      if (tabDino && tabSpace && tabSnake) {
+        tabDino.classList.toggle('active', gameType === 'dino');
+        tabSpace.classList.toggle('active', gameType === 'space');
+        tabSnake.classList.toggle('active', gameType === 'snake');
+
+        if (livesWrapper) livesWrapper.style.display = gameType === 'space' ? 'flex' : 'none';
+        if (dinoControls) dinoControls.style.display = gameType === 'dino' ? 'flex' : 'none';
+        if (spaceControls) spaceControls.style.display = gameType === 'space' ? 'flex' : 'none';
+        if (snakeControls) snakeControls.style.display = gameType === 'snake' ? 'flex' : 'none';
+
+        if (instructionsEl) {
+          if (gameType === 'dino') {
+            instructionsEl.innerHTML = '<span>⌨️ <strong>Space</strong> / <strong>↑</strong> to Jump | <strong>↓</strong> to Duck | Tap Screen</span>';
+          } else if (gameType === 'space') {
+            instructionsEl.innerHTML = '<span>⌨️ <strong>← →</strong> / <strong>A D</strong> or Mouse Drag | <strong>Space</strong> / Click to Fire</span>';
+          } else {
+            instructionsEl.innerHTML = '<span>⌨️ <strong>Arrow Keys</strong> / <strong>W A S D</strong> or Swipe to Turn</span>';
+          }
         }
       }
 
@@ -794,6 +1058,7 @@
 
     if (tabDino) tabDino.addEventListener('click', () => switchGame('dino'));
     if (tabSpace) tabSpace.addEventListener('click', () => switchGame('space'));
+    if (tabSnake) tabSnake.addEventListener('click', () => switchGame('snake'));
 
     // Open & Close Modal
     openGameModalFn = function (initialGame = 'dino') {
@@ -854,7 +1119,7 @@
             e.preventDefault();
             dinoDuck(true);
           }
-        } else {
+        } else if (currentGame === 'space') {
           if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
             e.preventDefault();
             spaceKeys.left = true;
@@ -867,6 +1132,20 @@
             e.preventDefault();
             fireSpaceLaser();
           }
+        } else if (currentGame === 'snake') {
+          if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+            e.preventDefault();
+            changeSnakeDirection(0, -1);
+          } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+            e.preventDefault();
+            changeSnakeDirection(0, 1);
+          } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+            e.preventDefault();
+            changeSnakeDirection(-1, 0);
+          } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+            e.preventDefault();
+            changeSnakeDirection(1, 0);
+          }
         }
 
         if (e.key === 'Escape') closeGameModal();
@@ -878,18 +1157,20 @@
         if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
           dinoDuck(false);
         }
-      } else {
+      } else if (currentGame === 'space') {
         if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') spaceKeys.left = false;
         if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') spaceKeys.right = false;
       }
     });
 
-    // Canvas Mouse & Touch controls
+    // Touch Swipe Detection for Snake
+    let touchStartX = 0, touchStartY = 0;
+
     canvas.addEventListener('mousedown', (e) => {
       e.preventDefault();
       if (currentGame === 'dino') {
         dinoJump();
-      } else {
+      } else if (currentGame === 'space') {
         fireSpaceLaser();
       }
     });
@@ -902,10 +1183,15 @@
     });
 
     canvas.addEventListener('touchstart', (e) => {
-      e.preventDefault();
+      if (e.touches && e.touches[0]) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      }
       if (currentGame === 'dino') {
+        e.preventDefault();
         dinoJump();
-      } else {
+      } else if (currentGame === 'space') {
+        e.preventDefault();
         const rect = canvas.getBoundingClientRect();
         if (e.touches && e.touches[0]) {
           player.x = Math.max(player.width / 2, Math.min(width - player.width / 2, e.touches[0].clientX - rect.left));
@@ -919,6 +1205,20 @@
         const rect = canvas.getBoundingClientRect();
         if (e.touches && e.touches[0]) {
           player.x = Math.max(player.width / 2, Math.min(width - player.width / 2, e.touches[0].clientX - rect.left));
+        }
+      }
+    }, { passive: true });
+
+    canvas.addEventListener('touchend', (e) => {
+      if (currentGame === 'snake' && e.changedTouches && e.changedTouches[0]) {
+        const deltaX = e.changedTouches[0].clientX - touchStartX;
+        const deltaY = e.changedTouches[0].clientY - touchStartY;
+        if (Math.abs(deltaX) > 20 || Math.abs(deltaY) > 20) {
+          if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            changeSnakeDirection(deltaX > 0 ? 1 : -1, 0);
+          } else {
+            changeSnakeDirection(0, deltaY > 0 ? 1 : -1);
+          }
         }
       }
     }, { passive: true });
@@ -949,6 +1249,24 @@
     if (touchFireBtn) {
       touchFireBtn.addEventListener('touchstart', (e) => { e.preventDefault(); fireSpaceLaser(); }, { passive: false });
       touchFireBtn.addEventListener('mousedown', () => fireSpaceLaser());
+    }
+
+    // Snake Touch D-Pad binds
+    if (touchSnakeUp) {
+      touchSnakeUp.addEventListener('touchstart', (e) => { e.preventDefault(); changeSnakeDirection(0, -1); }, { passive: false });
+      touchSnakeUp.addEventListener('mousedown', () => changeSnakeDirection(0, -1));
+    }
+    if (touchSnakeDown) {
+      touchSnakeDown.addEventListener('touchstart', (e) => { e.preventDefault(); changeSnakeDirection(0, 1); }, { passive: false });
+      touchSnakeDown.addEventListener('mousedown', () => changeSnakeDirection(0, 1));
+    }
+    if (touchSnakeLeft) {
+      touchSnakeLeft.addEventListener('touchstart', (e) => { e.preventDefault(); changeSnakeDirection(-1, 0); }, { passive: false });
+      touchSnakeLeft.addEventListener('mousedown', () => changeSnakeDirection(-1, 0));
+    }
+    if (touchSnakeRight) {
+      touchSnakeRight.addEventListener('touchstart', (e) => { e.preventDefault(); changeSnakeDirection(1, 0); }, { passive: false });
+      touchSnakeRight.addEventListener('mousedown', () => changeSnakeDirection(1, 0));
     }
 
     window.addEventListener('resize', () => {

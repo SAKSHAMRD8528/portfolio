@@ -386,19 +386,78 @@
     });
   }
 
-  /* ===== CONTACT FORM (Visual Only) ===== */
+  /* ===== CONTACT FORM (LIVE EMAIL INTEGRATION) ===== */
   const contactForm = document.getElementById('contactForm');
-  if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const btn = contactForm.querySelector('.btn-submit span');
-      const originalText = btn.textContent;
-      btn.textContent = 'Sent! ✓';
-      contactForm.reset();
+  const formStatus = document.getElementById('formStatusMsg');
+  const submitBtn = document.getElementById('contactSubmitBtn');
 
-      setTimeout(() => {
-        btn.textContent = originalText;
-      }, 3000);
+  if (contactForm) {
+    contactForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const btnSpan = submitBtn ? submitBtn.querySelector('span') : null;
+      const originalText = btnSpan ? btnSpan.textContent : 'Send Message';
+
+      if (submitBtn) submitBtn.disabled = true;
+      if (btnSpan) btnSpan.textContent = 'Sending... ⏳';
+      if (formStatus) {
+        formStatus.style.display = 'none';
+        formStatus.className = 'form-status-msg';
+      }
+
+      const name = document.getElementById('formName') ? document.getElementById('formName').value : '';
+      const email = document.getElementById('formEmail') ? document.getElementById('formEmail').value : '';
+      const subject = document.getElementById('formSubject') ? document.getElementById('formSubject').value : '';
+      const message = document.getElementById('formMessage') ? document.getElementById('formMessage').value : '';
+
+      try {
+        const payload = {
+          name: name,
+          email: email,
+          subject: `[Portfolio Contact] ${subject}`,
+          message: message,
+          to: 'sakshamrd852@gmail.com',
+          access_key: '64ee9c5b-38d7-4d76-88ce-ba78c93549ee' // Web3Forms Public Access Key
+        };
+
+        const response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (response.ok && (result.success || result.status === 200)) {
+          if (btnSpan) btnSpan.textContent = 'Message Sent! ✓';
+          if (formStatus) {
+            formStatus.textContent = '🎉 Thank you! Your message has been sent to Saksham directly.';
+            formStatus.className = 'form-status-msg success';
+            formStatus.style.display = 'block';
+          }
+          contactForm.reset();
+        } else {
+          throw new Error(result.message || 'Submission failed');
+        }
+      } catch (err) {
+        // Fallback gracefully to direct mailto if offline or API unavailable
+        if (formStatus) {
+          formStatus.innerHTML = `⚠️ Couldn't send automatically. <a href="mailto:sakshamrd852@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('Hi Saksham,\n\n' + message + '\n\nFrom: ' + name + ' (' + email + ')')}" style="color:#00d4ff; text-decoration:underline;">Click here to send email directly ↗</a>`;
+          formStatus.className = 'form-status-msg error';
+          formStatus.style.display = 'block';
+        }
+        if (btnSpan) btnSpan.textContent = 'Try Again';
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+        setTimeout(() => {
+          if (btnSpan && btnSpan.textContent === 'Message Sent! ✓') {
+            btnSpan.textContent = originalText;
+          }
+        }, 5000);
+      }
     });
   }
 
