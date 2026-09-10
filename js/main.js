@@ -458,15 +458,59 @@
     });
   }
 
-  /* ===== RESUME MODAL VIEWER ===== */
+  /* ===== RESUME MODAL VIEWER WITH PDF.JS RENDERING ===== */
   const resumeModal = document.getElementById('resumeModal');
   const closeResumeModal = document.getElementById('closeResumeModal');
   const backResumeBtn = document.getElementById('backResumeBtn');
   const backResumeBtnText = document.getElementById('backResumeBtnText');
   const resumeBackdrop = document.getElementById('resumeModalBackdrop');
   const resumeTriggers = document.querySelectorAll('[data-open-resume]');
+  const resumePdfContainer = document.getElementById('resumePdfContainer');
 
   let resumeOpenedFrom = null;
+  let pdfRendered = false;
+
+  async function loadAndRenderPdf() {
+    if (pdfRendered || !resumePdfContainer) return;
+
+    if (typeof window.pdfjsLib !== 'undefined') {
+      try {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        resumePdfContainer.innerHTML = '<div class="resume-loading"><div class="resume-spinner"></div><span>Loading Resume Document...</span></div>';
+
+        const loadingTask = pdfjsLib.getDocument('Saksham_Dhumale_Master_Resume.pdf');
+        const pdf = await loadingTask.promise;
+
+        resumePdfContainer.innerHTML = '';
+
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+          const page = await pdf.getPage(pageNum);
+          const canvas = document.createElement('canvas');
+          canvas.className = 'resume-page-canvas';
+          const ctx = canvas.getContext('2d');
+
+          // Render at high resolution (2x or devicePixelRatio) for crisp vector text
+          const viewport = page.getViewport({ scale: Math.max(window.devicePixelRatio || 1, 2) });
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+
+          await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+          resumePdfContainer.appendChild(canvas);
+        }
+        pdfRendered = true;
+      } catch (err) {
+        console.warn('PDF.js inline render fallback:', err);
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile && window.location.protocol.startsWith('http')) {
+          const fullPdfUrl = new URL('Saksham_Dhumale_Master_Resume.pdf', window.location.href).href;
+          resumePdfContainer.innerHTML = `<iframe src="https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(fullPdfUrl)}" class="resume-iframe" title="Resume Document"></iframe>`;
+        } else {
+          resumePdfContainer.innerHTML = `<iframe src="Saksham_Dhumale_Master_Resume.pdf#toolbar=0" class="resume-iframe" title="Resume Document"></iframe>`;
+        }
+      }
+    }
+  }
 
   function openResume(e, source) {
     if (e && e.preventDefault) e.preventDefault();
@@ -486,6 +530,7 @@
       resumeModal.classList.add('active');
       resumeModal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
+      loadAndRenderPdf();
     }
   }
 

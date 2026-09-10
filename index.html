@@ -18,7 +18,7 @@
   <!-- Devicon — Technology Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.16.0/devicon.min.css" />
 
-  <link rel="stylesheet" href="css/style.css?v=26.0" />
+  <link rel="stylesheet" href="css/style.css?v=27.0" />
 </head>
 <body>
 
@@ -564,8 +564,10 @@
           </button>
         </div>
       </div>
-      <div class="resume-modal-body">
-        <iframe src="Saksham_Dhumale_Master_Resume.pdf#toolbar=0&navpanes=0" class="resume-iframe" title="Resume Document"></iframe>
+      <div class="resume-modal-body" id="resumeModalBody">
+        <div class="resume-pdf-container" id="resumePdfContainer">
+          <iframe src="Saksham_Dhumale_Master_Resume.pdf#toolbar=0&navpanes=0" class="resume-iframe" id="resumeIframe" title="Resume Document"></iframe>
+        </div>
       </div>
     </div>
   </div>
@@ -687,9 +689,12 @@
     </div>
   </div>
 
-  <script src="js/particles.js?v=26.0"></script>
-  <script src="js/main.js?v=26.0"></script>
-  <script src="js/terminal.js?v=26.0"></script>
-  <script src="js/game.js?v=26.0"></script>
+  <!-- PDF.js — Cross-platform Canvas PDF Renderer for Mobile & Desktop -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <script src="js/particles.js?v=27.0"></script>
+  <script src="js/main.js?v=27.0"></script>
+  <script src="js/terminal.js?v=27.0"></script>
+  <script src="js/game.js?v=27.0"></script>
 </body>
 </html>
