@@ -2761,27 +2761,31 @@ body.theme-matrix .section-line {
 
 .game-touch-controls {
   display: none;
-  gap: 8px;
+  gap: 12px;
 }
 
 .touch-btn {
-  width: 44px;
-  height: 44px;
+  padding: 8px 20px;
+  height: 42px;
   background: #1e293b;
   border: 1px solid #334155;
   border-radius: var(--radius-sm);
   color: #fff;
-  font-size: 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   user-select: none;
   touch-action: manipulation;
+  cursor: pointer;
 }
 
 .touch-btn.fire {
-  background: #ff2d78;
-  border-color: #ff2d78;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
 }
 
 @media (max-width: 768px) {
@@ -2795,3 +2799,4 @@ body.theme-matrix .section-line {
     display: none;
   }
 }
+

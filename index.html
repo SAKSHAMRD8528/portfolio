@@ -599,21 +599,19 @@
         <div class="terminal-quick-pills">
           <span class="pills-label">Quick:</span>
           <button class="term-pill" data-cmd="help"><span class="pill-dot"></span>help</button>
+          <button class="term-pill" data-cmd="about"><span class="pill-dot"></span>about</button>
           <button class="term-pill" data-cmd="skills"><span class="pill-dot"></span>skills</button>
           <button class="term-pill" data-cmd="projects"><span class="pill-dot"></span>projects</button>
-          <button class="term-pill" data-cmd="about"><span class="pill-dot"></span>about</button>
           <button class="term-pill" data-cmd="resume"><span class="pill-dot"></span>resume</button>
           <button class="term-pill" data-cmd="contact"><span class="pill-dot"></span>contact</button>
-          <button class="term-pill" data-cmd="matrix"><span class="pill-dot"></span>matrix</button>
-          <button class="term-pill" data-cmd="quote"><span class="pill-dot"></span>quote</button>
-          <button class="term-pill" data-cmd="game"><span class="pill-dot"></span>game 🚀</button>
+          <button class="term-pill" data-cmd="dino"><span class="pill-dot"></span>dino 🦖</button>
           <button class="term-pill" data-cmd="clear"><span class="pill-dot"></span>clear</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ========== CYBER SPACE ARCADE GAME MODAL ========== -->
+  <!-- ========== CHROME DINO RUNNER GAME MODAL ========== -->
   <div class="game-modal-overlay" id="gameModal" aria-hidden="true" role="dialog" aria-modal="true">
     <div class="game-modal-backdrop" id="gameModalBackdrop"></div>
     <div class="game-modal-container">
@@ -625,12 +623,11 @@
             <span class="traffic-light green" title="Resume"></span>
           </div>
           <div class="game-title">
-            <span>🚀 Space Blaster Arcade</span>
+            <span>🦖 Chrome Dino Runner</span>
           </div>
           <div class="game-hud">
-            <div class="hud-item"><span class="hud-label">SCORE:</span> <span id="gameScore" class="hud-val">0</span></div>
-            <div class="hud-item"><span class="hud-label">HI:</span> <span id="gameHighScore" class="hud-val">0</span></div>
-            <div class="hud-item"><span id="gameLives" class="hud-lives">❤️❤️❤️</span></div>
+            <div class="hud-item"><span class="hud-label">HI:</span> <span id="gameHighScore" class="hud-val">00000</span></div>
+            <div class="hud-item"><span class="hud-label">SCORE:</span> <span id="gameScore" class="hud-val">00000</span></div>
             <button class="game-modal-close-btn" id="closeGameIconBtn" aria-label="Close Game">✕</button>
           </div>
         </div>
@@ -643,7 +640,7 @@
             <h3 class="game-over-title" id="gameOverTitle">GAME OVER</h3>
             <p class="game-over-subtitle" id="gameOverSubtitle">Score: 0</p>
             <button class="btn btn-primary btn-restart" id="gameRestartBtn">
-              <span>Play Again (Space)</span>
+              <span>Play Again (Space / Tap)</span>
             </button>
           </div>
         </div>
@@ -651,12 +648,11 @@
         <!-- Controls Bar -->
         <div class="game-controls-bar">
           <div class="game-instructions">
-            <span>⌨️ <strong>← →</strong> or <strong>A / D</strong> to Move | <strong>Space</strong> / Click to Shoot</span>
+            <span>⌨️ <strong>Space</strong> / <strong>↑</strong> to Jump | <strong>↓</strong> to Duck | Click / Tap to Jump</span>
           </div>
           <div class="game-touch-controls">
-            <button class="touch-btn" id="touchLeftBtn">◀</button>
-            <button class="touch-btn fire" id="touchFireBtn">🔥</button>
-            <button class="touch-btn" id="touchRightBtn">▶</button>
+            <button class="touch-btn" id="touchDuckBtn">⬇ DUCK</button>
+            <button class="touch-btn fire" id="touchJumpBtn">⬆ JUMP</button>
           </div>
         </div>
       </div>
@@ -664,8 +660,8 @@
   </div>
 
   <script src="js/particles.js"></script>
-  <script src="js/main.js?v=7.0"></script>
-  <script src="js/terminal.js?v=3.0"></script>
-  <script src="js/game.js?v=2.0"></script>
+  <script src="js/main.js?v=7.1"></script>
+  <script src="js/terminal.js?v=3.1"></script>
+  <script src="js/game.js?v=3.0"></script>
 </body>
 </html>
