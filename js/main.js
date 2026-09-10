@@ -419,6 +419,200 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  /* ===== COMMAND PALETTE (CTRL + K) ===== */
+  const cmdPalette = document.getElementById('cmdPalette');
+  const cmdTriggerBtn = document.getElementById('cmdTriggerBtn');
+  const closeCmdBtn = document.getElementById('closeCmdPalette');
+  const cmdBackdrop = document.getElementById('cmdPaletteBackdrop');
+  const cmdInput = document.getElementById('cmdInput');
+  const cmdResults = document.getElementById('cmdResults');
+  const cmdOutput = document.getElementById('cmdOutput');
+  const cmdItems = document.querySelectorAll('.cmd-item');
+
+  let selectedIndex = 0;
+
+  function openCmdPalette() {
+    if (!cmdPalette) return;
+    cmdPalette.classList.add('active');
+    cmdPalette.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    if (cmdInput) {
+      cmdInput.value = '';
+      filterCommands('');
+      setTimeout(() => cmdInput.focus(), 50);
+    }
+  }
+
+  function closeCmdPalette() {
+    if (!cmdPalette) return;
+    cmdPalette.classList.remove('active');
+    cmdPalette.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    if (cmdOutput) {
+      cmdOutput.style.display = 'none';
+      cmdOutput.innerHTML = '';
+    }
+  }
+
+  if (cmdTriggerBtn) cmdTriggerBtn.addEventListener('click', openCmdPalette);
+  if (closeCmdBtn) closeCmdBtn.addEventListener('click', closeCmdPalette);
+  if (cmdBackdrop) cmdBackdrop.addEventListener('click', closeCmdPalette);
+
+  // Keyboard shortcut: Ctrl+K / Cmd+K
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      if (cmdPalette && cmdPalette.classList.contains('active')) {
+        closeCmdPalette();
+      } else {
+        openCmdPalette();
+      }
+    } else if (e.key === 'Escape' && cmdPalette && cmdPalette.classList.contains('active')) {
+      closeCmdPalette();
+    }
+  });
+
+  // Filter command list on typing
+  if (cmdInput) {
+    cmdInput.addEventListener('input', (e) => {
+      filterCommands(e.target.value.toLowerCase().trim());
+    });
+
+    cmdInput.addEventListener('keydown', (e) => {
+      const visibleItems = Array.from(document.querySelectorAll('.cmd-item:not([style*="display: none"])'));
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selectedIndex = (selectedIndex + 1) % visibleItems.length;
+        highlightItem(visibleItems);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selectedIndex = (selectedIndex - 1 + visibleItems.length) % visibleItems.length;
+        highlightItem(visibleItems);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (visibleItems[selectedIndex]) {
+          executeCommand(visibleItems[selectedIndex]);
+        } else if (cmdInput.value.trim().length > 0) {
+          executeRawCommand(cmdInput.value.trim().toLowerCase());
+        }
+      }
+    });
+  }
+
+  function filterCommands(query) {
+    let visibleCount = 0;
+    cmdItems.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      if (!query || text.includes(query)) {
+        item.style.display = 'flex';
+        visibleCount++;
+      } else {
+        item.style.display = 'none';
+      }
+    });
+
+    // Also toggle section labels
+    document.querySelectorAll('.cmd-group-label').forEach(label => {
+      let next = label.nextElementSibling;
+      let hasVisible = false;
+      while (next && next.classList.contains('cmd-item')) {
+        if (next.style.display !== 'none') hasVisible = true;
+        next = next.nextElementSibling;
+      }
+      label.style.display = hasVisible ? 'block' : 'none';
+    });
+
+    selectedIndex = 0;
+    const visibleItems = Array.from(document.querySelectorAll('.cmd-item:not([style*="display: none"])'));
+    highlightItem(visibleItems);
+  }
+
+  function highlightItem(visibleItems) {
+    cmdItems.forEach(item => item.classList.remove('selected'));
+    if (visibleItems[selectedIndex]) {
+      visibleItems[selectedIndex].classList.add('selected');
+      visibleItems[selectedIndex].scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  cmdItems.forEach((item) => {
+    item.addEventListener('mouseenter', () => {
+      const visibleItems = Array.from(document.querySelectorAll('.cmd-item:not([style*="display: none"])'));
+      selectedIndex = visibleItems.indexOf(item);
+      highlightItem(visibleItems);
+    });
+    item.addEventListener('click', () => executeCommand(item));
+  });
+
+  function executeCommand(item) {
+    const action = item.getAttribute('data-action');
+    if (action === 'nav') {
+      const target = document.querySelector(item.getAttribute('data-target'));
+      closeCmdPalette();
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    } else if (action === 'resume') {
+      closeCmdPalette();
+      setTimeout(openResume, 100);
+    } else if (action === 'download-resume') {
+      const link = document.createElement('a');
+      link.href = 'Saksham_Dhumale_Master_Resume.pdf';
+      link.download = 'Saksham_Dhumale_Resume.pdf';
+      link.click();
+      closeCmdPalette();
+    } else if (action === 'theme') {
+      const themeName = item.getAttribute('data-theme');
+      if (typeof applyTheme === 'function') {
+        applyTheme(themeName);
+      } else {
+        document.body.setAttribute('data-theme', themeName);
+        localStorage.setItem('portfolioTheme', themeName);
+      }
+      closeCmdPalette();
+    } else if (action === 'cli') {
+      executeRawCommand(item.getAttribute('data-cmd'));
+    }
+  }
+
+  function executeRawCommand(cmd) {
+    if (!cmdOutput) return;
+    cmdOutput.style.display = 'block';
+
+    const quotes = [
+      '"First, solve the problem. Then, write the code." – John Johnson',
+      '"Simplicity is the soul of efficiency." – Austin Freeman',
+      '"Make it work, make it right, make it fast." – Kent Beck',
+      '"Machine Learning is the new electricity." – Andrew Ng'
+    ];
+
+    if (cmd === 'skills') {
+      cmdOutput.innerHTML = `
+        <div class="cmd-term-title">💻 Technical Skills Summary:</div>
+        <div class="cmd-term-line"><strong>Languages:</strong> Python, Java, SQL, JavaScript, HTML5/CSS3</div>
+        <div class="cmd-term-line"><strong>Frameworks & ML:</strong> Flask, TensorFlow, Keras, OpenCV, Scikit-Learn</div>
+        <div class="cmd-term-line"><strong>Data & Analytics:</strong> MySQL, PowerBI, NumPy, Pandas, Data Wrangling</div>
+      `;
+    } else if (cmd === 'socials') {
+      cmdOutput.innerHTML = `
+        <div class="cmd-term-title">🌐 Connect with Saksham:</div>
+        <div class="cmd-term-line">GitHub: <a href="https://github.com/SAKSHAMRD8528" target="_blank">github.com/SAKSHAMRD8528</a></div>
+        <div class="cmd-term-line">LinkedIn: <a href="https://linkedin.com/" target="_blank">linkedin.com/in/sakshamdhumale</a></div>
+        <div class="cmd-term-line">Email: <a href="mailto:sakshamrd852@gmail.com">sakshamrd852@gmail.com</a></div>
+      `;
+    } else if (cmd === 'quote') {
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      cmdOutput.innerHTML = `<div class="cmd-term-quote">${randomQuote}</div>`;
+    } else if (cmd === 'matrix' || cmd === 'matrix-rain') {
+      if (typeof applyTheme === 'function') applyTheme('matrix');
+      cmdOutput.innerHTML = `<div class="cmd-term-line" style="color: #00ff41;">[SYSTEM] Matrix subroutines loaded. Welcome to the construct.</div>`;
+      setTimeout(closeCmdPalette, 1200);
+    } else if (cmd === 'clear') {
+      cmdOutput.innerHTML = '';
+      cmdOutput.style.display = 'none';
+    } else {
+      cmdOutput.innerHTML = `<div class="cmd-term-error">Command not found: "${cmd}". Available: <code>skills</code>, <code>socials</code>, <code>matrix</code>, <code>quote</code>, <code>clear</code>.</div>`;
+    }
+  }
+
   /* ===== SMOOTH SCROLL FOR ALL ANCHOR LINKS ===== */
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', (e) => {
