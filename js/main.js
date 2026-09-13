@@ -10,27 +10,42 @@
   /* ===== CUSTOM CURSOR (DOT & RING — PC ONLY) ===== */
   const cursorDot = document.getElementById('cursorDot');
   const cursorRing = document.getElementById('cursorRing');
-  const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 768) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+  const isMobile = window.innerWidth <= 768;
 
-  if (isTouchDevice) {
+  if (isMobile) {
     if (cursorDot) cursorDot.remove();
     if (cursorRing) cursorRing.remove();
   } else if (cursorDot && cursorRing) {
     let mouseX = -100, mouseY = -100;
     let ringX = -100, ringY = -100;
+    let isInitialized = false;
 
-    document.addEventListener('mousemove', (e) => {
+    // Explicitly hide native arrow cursor in DOM
+    document.documentElement.style.cursor = 'none';
+    document.body.style.cursor = 'none';
+
+    window.addEventListener('mousemove', (e) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
+      if (!isInitialized) {
+        ringX = mouseX;
+        ringY = mouseY;
+        isInitialized = true;
+      }
       cursorDot.style.left = mouseX + 'px';
       cursorDot.style.top = mouseY + 'px';
       cursorDot.style.opacity = '1';
       cursorRing.style.opacity = '1';
-    });
+    }, { passive: true });
 
     document.addEventListener('mouseleave', () => {
       cursorDot.style.opacity = '0';
       cursorRing.style.opacity = '0';
+    });
+
+    document.addEventListener('mouseenter', () => {
+      cursorDot.style.opacity = '1';
+      cursorRing.style.opacity = '1';
     });
 
     function animateRing() {
@@ -42,11 +57,13 @@
     }
     animateRing();
 
-    // Hover effect on interactive elements
-    const hoverTargets = document.querySelectorAll('a, button, .project-card, .tech-tag, .skill-category, .timeline-card, .term-pill, .nav-terminal-btn');
-    hoverTargets.forEach(el => {
-      el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-      el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+    // Hover effect on interactive elements via delegation
+    document.addEventListener('mouseover', (e) => {
+      if (e.target && e.target.closest('a, button, input, textarea, select, label, .project-card, .tech-tag, .skill-category, .timeline-card, .term-pill, .nav-terminal-btn, .theme-swatch, .theme-palette-btn, .hamburger, .btn, .filter-btn, .test-nav-btn, .test-dot, .back-to-top, [role="button"], [data-open-resume], [data-open-game]')) {
+        document.body.classList.add('cursor-hover');
+      } else {
+        document.body.classList.remove('cursor-hover');
+      }
     });
   }
 
