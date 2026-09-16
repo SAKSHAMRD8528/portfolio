@@ -409,6 +409,13 @@
     contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
+      // Check anti-spam honeypot
+      const honeyField = contactForm.querySelector('input[name="_honey"]');
+      if (honeyField && honeyField.value) {
+        // Silent bot discard
+        return;
+      }
+
       const btnSpan = submitBtn ? submitBtn.querySelector('span') : null;
       const originalText = btnSpan ? btnSpan.textContent : 'Send Message';
 
@@ -419,22 +426,34 @@
         formStatus.className = 'form-status-msg';
       }
 
-      const name = document.getElementById('formName') ? document.getElementById('formName').value : '';
-      const email = document.getElementById('formEmail') ? document.getElementById('formEmail').value : '';
-      const subject = document.getElementById('formSubject') ? document.getElementById('formSubject').value : '';
-      const message = document.getElementById('formMessage') ? document.getElementById('formMessage').value : '';
+      const name = document.getElementById('formName') ? document.getElementById('formName').value.trim() : '';
+      const email = document.getElementById('formEmail') ? document.getElementById('formEmail').value.trim() : '';
+      const subject = document.getElementById('formSubject') ? document.getElementById('formSubject').value.trim() : '';
+      const message = document.getElementById('formMessage') ? document.getElementById('formMessage').value.trim() : '';
+
+      // Sync hidden fields for FormSubmit
+      const hiddenSubject = document.getElementById('formHiddenSubject');
+      if (hiddenSubject) hiddenSubject.value = `[Portfolio Contact] ${subject || 'New Message'} — from ${name}`;
+      const hiddenNext = document.getElementById('formHiddenNext');
+      if (hiddenNext) hiddenNext.value = window.location.href;
+
+      // When tested locally via direct file:/// opening, submit via native POST
+      if (window.location.protocol === 'file:') {
+        contactForm.submit();
+        return;
+      }
 
       try {
         const payload = {
           name: name,
           email: email,
-          subject: `[Portfolio Contact] ${subject}`,
+          _subject: `[Portfolio Contact] ${subject || 'New Message'} — from ${name}`,
           message: message,
-          to: 'sakshamrd852@gmail.com',
-          access_key: '64ee9c5b-38d7-4d76-88ce-ba78c93549ee' // Web3Forms Public Access Key
+          _captcha: 'false',
+          _template: 'table'
         };
 
-        const response = await fetch('https://api.web3forms.com/submit', {
+        const response = await fetch('https://formsubmit.co/ajax/sakshamrd852@gmail.com', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -445,10 +464,11 @@
 
         const result = await response.json();
 
-        if (response.ok && (result.success || result.status === 200)) {
+        // FormSubmit returns success: "true" or true or message regarding activation
+        if (response.ok && (result.success === 'true' || result.success === true || (result.message && result.message.includes('Activation')))) {
           if (btnSpan) btnSpan.textContent = 'Message Sent! ✓';
           if (formStatus) {
-            formStatus.textContent = '🎉 Thank you! Your message has been sent to Saksham directly.';
+            formStatus.innerHTML = `🎉 <strong>Thank you, ${name || 'friend'}!</strong> Your message has been sent successfully to Saksham.`;
             formStatus.className = 'form-status-msg success';
             formStatus.style.display = 'block';
           }
@@ -457,9 +477,10 @@
           throw new Error(result.message || 'Submission failed');
         }
       } catch (err) {
+        console.warn('FormSubmit AJAX error:', err);
         // Fallback gracefully to direct mailto if offline or API unavailable
         if (formStatus) {
-          formStatus.innerHTML = `⚠️ Couldn't send automatically. <a href="mailto:sakshamrd852@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('Hi Saksham,\n\n' + message + '\n\nFrom: ' + name + ' (' + email + ')')}" style="color:#00d4ff; text-decoration:underline;">Click here to send email directly ↗</a>`;
+          formStatus.innerHTML = `⚠️ Couldn't send automatically. <a href="mailto:sakshamrd852@gmail.com?subject=${encodeURIComponent('[Portfolio] ' + subject)}&body=${encodeURIComponent('Hi Saksham,\n\n' + message + '\n\nFrom: ' + name + ' (' + email + ')')}" style="color:var(--accent-primary); text-decoration:underline; font-weight:600;">Click here to send email directly ↗</a>`;
           formStatus.className = 'form-status-msg error';
           formStatus.style.display = 'block';
         }
@@ -467,7 +488,7 @@
       } finally {
         if (submitBtn) submitBtn.disabled = false;
         setTimeout(() => {
-          if (btnSpan && btnSpan.textContent === 'Message Sent! ✓') {
+          if (btnSpan && (btnSpan.textContent === 'Message Sent! ✓' || btnSpan.textContent === 'Try Again')) {
             btnSpan.textContent = originalText;
           }
         }, 5000);
