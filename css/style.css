@@ -232,7 +232,7 @@ body {
 a {
   color: var(--accent-secondary);
   text-decoration: none;
-  cursor: pointer;
+  cursor: none;
   transition: color var(--transition-fast);
 }
 
@@ -241,7 +241,7 @@ a:hover {
 }
 
 button, input, textarea, select, .theme-toggle, .theme-palette-btn, .theme-swatch, .hamburger, .btn, .filter-btn, .test-nav-btn, .test-dot, .back-to-top, .term-pill, .nav-terminal-btn {
-  cursor: pointer;
+  cursor: none;
 }
 
 img { max-width: 100%; height: auto; display: block; }
@@ -317,12 +317,15 @@ body.cursor-hover .cursor-ring {
   .cursor-ring {
     display: none !important;
   }
-  html,
-  body,
-  *,
-  *::before,
-  *::after {
-    cursor: auto !important;
+  /* On small screens (phones/tablets), restore the native cursor so it's usable on touch */
+  @media (pointer: coarse) {
+    html,
+    body,
+    *,
+    *::before,
+    *::after {
+      cursor: auto !important;
+    }
   }
 }
 

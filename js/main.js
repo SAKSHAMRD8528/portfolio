@@ -12,6 +12,17 @@
   const cursorRing = document.getElementById('cursorRing');
   const isMobile = window.innerWidth <= 768;
 
+  // Always force-hide the native OS cursor via JS (CSS alone can miss touchpad on some browsers)
+  (function forceHideCursor() {
+    const styleEl = document.createElement('style');
+    styleEl.id = 'force-cursor-none';
+    styleEl.textContent = 'html,html *,html *::before,html *::after{cursor:none!important}';
+    document.head.appendChild(styleEl);
+    // Belt-and-suspenders: also set via style attribute
+    document.documentElement.style.setProperty('cursor', 'none', 'important');
+    document.body.style.setProperty('cursor', 'none', 'important');
+  })();
+
   if (isMobile) {
     if (cursorDot) cursorDot.remove();
     if (cursorRing) cursorRing.remove();
@@ -19,10 +30,6 @@
     let mouseX = -100, mouseY = -100;
     let ringX = -100, ringY = -100;
     let isInitialized = false;
-
-    // Explicitly hide native arrow cursor in DOM
-    document.documentElement.style.cursor = 'none';
-    document.body.style.cursor = 'none';
 
     window.addEventListener('mousemove', (e) => {
       mouseX = e.clientX;

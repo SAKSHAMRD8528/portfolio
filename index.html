@@ -22,7 +22,14 @@
 
   <link rel="stylesheet" href="css/style.css?v=32.0" />
   <style>
-    *, *::before, *::after, html, body, a, button, input, textarea, select {
+    /* Hide native cursor everywhere — custom cursor handles all pointing */
+    html, html *, html *::before, html *::after {
+      cursor: none !important;
+    }
+    /* Extra specificity for interactive elements that browsers tend to override */
+    a, button, input, textarea, select, label,
+    [role="button"], [tabindex], summary, details,
+    [draggable], ::file-selector-button {
       cursor: none !important;
     }
   </style>
