@@ -835,6 +835,7 @@
   (function initSkillFilterAndContact() {
     const skillTabs = document.querySelectorAll('#skillFilterBar .skill-filter-tab');
     const skillCategories = document.querySelectorAll('.skills-grid .skill-category');
+    const techTags = document.querySelectorAll('.tech-tags .tech-tag');
 
     skillTabs.forEach(tab => {
       tab.addEventListener('click', () => {
@@ -843,13 +844,25 @@
         tab.classList.add('active');
 
         const filter = tab.getAttribute('data-skill-filter');
+
+        // Filter skill category cards
         skillCategories.forEach(cat => {
           const catKey = cat.getAttribute('data-skill-category');
           if (filter === 'all' || catKey === filter) {
-            cat.style.display = 'block';
+            cat.style.display = '';
             cat.style.animation = 'fadeIn 0.3s ease forwards';
           } else {
             cat.style.display = 'none';
+          }
+        });
+
+        // Filter bottom tech tags
+        techTags.forEach(tag => {
+          const tagKey = tag.getAttribute('data-skill-category');
+          if (filter === 'all' || tagKey === filter) {
+            tag.style.display = '';
+          } else {
+            tag.style.display = 'none';
           }
         });
       });

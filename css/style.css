@@ -1511,7 +1511,10 @@ body.cursor-hover .cursor-ring {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 12px;
+  align-items: center;
+  gap: 10px 14px;
+  max-width: 920px;
+  margin: 20px auto 0 auto;
 }
 
 .tech-tag {
