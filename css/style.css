@@ -28,16 +28,16 @@
   gap: 24px;
 }
 .loading-logo {
-  font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Outfit', 'Syne', sans-serif !important;
   font-size: 4rem;
-  font-weight: 800;
-  letter-spacing: -2px;
-  color: #ffffff;
+  font-weight: 900 !important;
+  letter-spacing: -1.5px !important;
+  color: #ffffff !important;
   animation: loadingPulse 1.4s ease-in-out infinite;
 }
 .loading-dot {
-  color: #ff2a85;
-  font-weight: 800;
+  color: #ff2a85 !important;
+  font-weight: 900 !important;
 }
 @keyframes loadingPulse {
   0%, 100% { opacity: 1; transform: scale(1); }
@@ -850,17 +850,18 @@ body.cursor-hover .cursor-ring {
 }
 
 .nav-logo {
-  font-family: 'Space Grotesk', var(--font-heading);
-  font-size: 1.7rem;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: -0.8px;
+  font-family: 'Outfit', 'Syne', sans-serif !important;
+  font-size: 1.8rem;
+  font-weight: 900 !important;
+  color: #ffffff !important;
+  letter-spacing: -1px !important;
+  text-decoration: none !important;
 }
 
 .logo-dot {
-  color: #ff2a85;
-  font-size: 2rem;
-  font-weight: 800;
+  color: #ff2a85 !important;
+  font-size: 1.1em !important;
+  font-weight: 900 !important;
 }
 
 .nav-links {
@@ -2097,11 +2098,11 @@ a.contact-detail-item:hover {
 }
 
 .footer-logo {
-  font-family: 'Space Grotesk', var(--font-heading);
+  font-family: 'Outfit', 'Syne', sans-serif !important;
   font-size: 1.8rem;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: -0.8px;
+  font-weight: 900 !important;
+  color: #ffffff !important;
+  letter-spacing: -1px !important;
   margin-bottom: 4px;
 }
 
