@@ -693,219 +693,18 @@
      WORLD-CLASS INTERACTIVE ENGINES — AWARD-WINNING V37
      ============================================================ */
 
-  /* 1. WEB AUDIO SFX ENGINE (Synthesized Warm Haptic Audio) */
-  const AudioEngine = (function() {
-    let ctx = null;
-    // Muted by default to be non-intrusive
-    let muted = localStorage.getItem('portfolioSoundMuted') === null ? true : localStorage.getItem('portfolioSoundMuted') === 'true';
-    const soundToggle = document.getElementById('soundToggle');
-
-    function getCtx() {
-      if (!ctx) {
-        ctx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (ctx.state === 'suspended') ctx.resume();
-      return ctx;
-    }
-
-    function updateUI() {
-      if (soundToggle) {
-        soundToggle.classList.toggle('muted', muted);
-        const iconOn = soundToggle.querySelector('.icon-sound-on');
-        const iconOff = soundToggle.querySelector('.icon-sound-off');
-        if (iconOn && iconOff) {
-          iconOn.style.display = muted ? 'none' : 'block';
-          iconOff.style.display = muted ? 'block' : 'none';
-        }
-      }
-    }
-    updateUI();
-
-    if (soundToggle) {
-      soundToggle.addEventListener('click', () => {
-        muted = !muted;
-        localStorage.setItem('portfolioSoundMuted', muted);
-        updateUI();
-        if (!muted) AudioEngine.playClick();
-      });
-    }
-
-    return {
-      playHover() {
-        // Disabled hover audio by default to avoid repetitive noise
-        return;
-      },
-      playClick() {
-        if (muted) return;
-        try {
-          const c = getCtx();
-          const osc = c.createOscillator();
-          const gain = c.createGain();
-          const filter = c.createBiquadFilter();
-
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(320, c.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(120, c.currentTime + 0.02);
-
-          filter.type = 'lowpass';
-          filter.frequency.setValueAtTime(1000, c.currentTime);
-
-          gain.gain.setValueAtTime(0.01, c.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.02);
-
-          osc.connect(filter);
-          filter.connect(gain);
-          gain.connect(c.destination);
-
-          osc.start(c.currentTime);
-          osc.stop(c.currentTime + 0.02);
-        } catch(e){}
-      },
-      playChime() {
-        if (muted) return;
-        try {
-          const c = getCtx();
-          [440, 554.37, 659.25].forEach((freq, idx) => {
-            const osc = c.createOscillator();
-            const gain = c.createGain();
-            const filter = c.createBiquadFilter();
-
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, c.currentTime + idx * 0.05);
-
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(1600, c.currentTime + idx * 0.05);
-
-            gain.gain.setValueAtTime(0.008, c.currentTime + idx * 0.05);
-            gain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + idx * 0.05 + 0.2);
-
-            osc.connect(filter);
-            filter.connect(gain);
-            gain.connect(c.destination);
-
-            osc.start(c.currentTime + idx * 0.05);
-            osc.stop(c.currentTime + idx * 0.05 + 0.2);
-          });
-        } catch(e){}
-      },
-      playAchievement() {
-        if (muted) return;
-        try {
-          const c = getCtx();
-          [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
-            const osc = c.createOscillator();
-            const gain = c.createGain();
-            const filter = c.createBiquadFilter();
-
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, c.currentTime + idx * 0.07);
-
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(2000, c.currentTime + idx * 0.07);
-
-            gain.gain.setValueAtTime(0.012, c.currentTime + idx * 0.07);
-            gain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + idx * 0.07 + 0.25);
-
-            osc.connect(filter);
-            filter.connect(gain);
-            gain.connect(c.destination);
-
-            osc.start(c.currentTime + idx * 0.07);
-            osc.stop(c.currentTime + idx * 0.07 + 0.25);
-          });
-        } catch(e){}
-      }
-    };
-  })();
+  /* 1. NO-OP AUDIO & TROPHY STUBS */
+  const AudioEngine = {
+    playHover() {},
+    playClick() {},
+    playChime() {},
+    playAchievement() {}
+  };
   window.AudioEngine = AudioEngine;
 
-  /* 2. ACHIEVEMENTS & BADGES ENGINE */
-  const AchievementManager = (function() {
-    const badges = {
-      arcade: { id: 'arcade', icon: '🎮', title: 'Arcade Master', desc: 'Played one of Saksham’s mini games' },
-      terminal: { id: 'terminal', icon: '💻', title: 'Terminal Master', desc: 'Executed 3+ commands in the dev terminal' },
-      theme: { id: 'theme', icon: '🎨', title: 'Style Collector', desc: 'Explored custom color palettes' },
-      explorer: { id: 'explorer', icon: '🔍', title: 'Spotlight Explorer', desc: 'Opened the Cmd+K Command Palette' },
-      speed: { id: 'speed', icon: '⚡', title: 'Speed Reader', desc: 'Scrolled all the way to the footer' }
-    };
-
-    let unlocked = JSON.parse(localStorage.getItem('portfolioAchievements') || '{}');
-
-    function updateBadgeCount() {
-      const countEl = document.getElementById('trophyBadgeCount');
-      const total = Object.keys(badges).length;
-      const current = Object.keys(unlocked).length;
-      if (countEl) countEl.textContent = `${current}/${total}`;
-    }
-    updateBadgeCount();
-
-    function showToast(badge) {
-      AudioEngine.playAchievement();
-      const container = document.getElementById('achievementToastContainer');
-      if (!container) return;
-
-      const toast = document.createElement('div');
-      toast.className = 'achievement-toast';
-      toast.innerHTML = `
-        <div class="achievement-toast-icon">${badge.icon}</div>
-        <div>
-          <div class="toast-tag">TROPHY UNLOCKED!</div>
-          <div class="toast-title">${badge.title}</div>
-        </div>
-      `;
-      container.appendChild(toast);
-
-      setTimeout(() => {
-        toast.style.animation = 'toastSlideIn 0.4s ease reverse forwards';
-        setTimeout(() => toast.remove(), 400);
-      }, 4000);
-    }
-
-    function unlock(id) {
-      if (!unlocked[id] && badges[id]) {
-        unlocked[id] = true;
-        localStorage.setItem('portfolioAchievements', JSON.stringify(unlocked));
-        updateBadgeCount();
-        showToast(badges[id]);
-      }
-    }
-
-    function openAchievementsModal() {
-      AudioEngine.playClick();
-      renderGrid();
-      if (modal) {
-        modal.classList.add('active');
-        modal.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-      }
-    }
-
-    function closeAchievementsModal() {
-      if (modal) {
-        modal.classList.remove('active');
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-      }
-    }
-
-    window.openAchievementsModal = openAchievementsModal;
-    window.closeAchievementsModal = closeAchievementsModal;
-
-    // Render grid on initialization so data is ready
-    renderGrid();
-
-    if (trophyBtn) trophyBtn.addEventListener('click', openAchievementsModal);
-    if (closeBtn) closeBtn.addEventListener('click', closeAchievementsModal);
-    if (backdrop) backdrop.addEventListener('click', closeAchievementsModal);
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
-        closeAchievementsModal();
-      }
-    });
-
-    return { unlock, openModal: openAchievementsModal, closeModal: closeAchievementsModal };
-  })();
+  const AchievementManager = {
+    unlock() {}
+  };
   window.unlockAchievement = AchievementManager.unlock;
 
   /* 3. 3D CARD PERSPECTIVE TILT EFFECT */
@@ -948,7 +747,6 @@
       { category: 'Tools & Games', icon: '🦖', title: 'Cyber Runner (Dino)', desc: 'Play Chrome Dino arcade game', action: () => window.openGameModal && window.openGameModal('dino') },
       { category: 'Tools & Games', icon: '🚀', title: 'Space Blaster', desc: 'Play Space Shooter arcade game', action: () => window.openGameModal && window.openGameModal('space') },
       { category: 'Tools & Games', icon: '🐍', title: 'Cyber Snake', desc: 'Play Retro Snake arcade game', action: () => window.openGameModal && window.openGameModal('snake') },
-      { category: 'Tools & Games', icon: '🏆', title: 'Achievements & Badges', desc: 'View unlocked trophies', action: () => document.getElementById('trophyDrawerBtn')?.click() },
       { category: 'Themes', icon: '🎨', title: 'Cyber Theme', desc: 'Switch to Cyber Purple & Blue', action: () => setTheme('cyber') },
       { category: 'Themes', icon: '💚', title: 'Matrix Theme', desc: 'Switch to Hacker Matrix Green', action: () => setTheme('matrix') },
       { category: 'Themes', icon: '💖', title: 'Synthwave Theme', desc: 'Switch to Retro Neon Pink', action: () => setTheme('synthwave') },
