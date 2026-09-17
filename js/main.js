@@ -693,10 +693,11 @@
      WORLD-CLASS INTERACTIVE ENGINES — AWARD-WINNING V37
      ============================================================ */
 
-  /* 1. WEB AUDIO SFX ENGINE (Synthesized Audio) */
+  /* 1. WEB AUDIO SFX ENGINE (Synthesized Warm Haptic Audio) */
   const AudioEngine = (function() {
     let ctx = null;
-    let muted = localStorage.getItem('portfolioSoundMuted') === 'true';
+    // Muted by default to be non-intrusive
+    let muted = localStorage.getItem('portfolioSoundMuted') === null ? true : localStorage.getItem('portfolioSoundMuted') === 'true';
     const soundToggle = document.getElementById('soundToggle');
 
     function getCtx() {
@@ -725,27 +726,14 @@
         muted = !muted;
         localStorage.setItem('portfolioSoundMuted', muted);
         updateUI();
-        if (!muted) AudioEngine.playChime();
+        if (!muted) AudioEngine.playClick();
       });
     }
 
     return {
       playHover() {
-        if (muted) return;
-        try {
-          const c = getCtx();
-          const osc = c.createOscillator();
-          const gain = c.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(800, c.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(1200, c.currentTime + 0.05);
-          gain.gain.setValueAtTime(0.015, c.currentTime);
-          gain.gain.linearRampToValueAtTime(0.001, c.currentTime + 0.05);
-          osc.connect(gain);
-          gain.connect(c.destination);
-          osc.start();
-          osc.stop(c.currentTime + 0.05);
-        } catch(e){}
+        // Disabled hover audio by default to avoid repetitive noise
+        return;
       },
       playClick() {
         if (muted) return;
@@ -753,32 +741,50 @@
           const c = getCtx();
           const osc = c.createOscillator();
           const gain = c.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(450, c.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(150, c.currentTime + 0.06);
-          gain.gain.setValueAtTime(0.04, c.currentTime);
-          gain.gain.linearRampToValueAtTime(0.001, c.currentTime + 0.06);
-          osc.connect(gain);
+          const filter = c.createBiquadFilter();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(320, c.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(120, c.currentTime + 0.02);
+
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(1000, c.currentTime);
+
+          gain.gain.setValueAtTime(0.01, c.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.02);
+
+          osc.connect(filter);
+          filter.connect(gain);
           gain.connect(c.destination);
-          osc.start();
-          osc.stop(c.currentTime + 0.06);
+
+          osc.start(c.currentTime);
+          osc.stop(c.currentTime + 0.02);
         } catch(e){}
       },
       playChime() {
         if (muted) return;
         try {
           const c = getCtx();
-          [523.25, 659.25, 783.99].forEach((freq, idx) => {
+          [440, 554.37, 659.25].forEach((freq, idx) => {
             const osc = c.createOscillator();
             const gain = c.createGain();
+            const filter = c.createBiquadFilter();
+
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, c.currentTime + idx * 0.06);
-            gain.gain.setValueAtTime(0.03, c.currentTime + idx * 0.06);
-            gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + idx * 0.06 + 0.25);
-            osc.connect(gain);
+            osc.frequency.setValueAtTime(freq, c.currentTime + idx * 0.05);
+
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(1600, c.currentTime + idx * 0.05);
+
+            gain.gain.setValueAtTime(0.008, c.currentTime + idx * 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + idx * 0.05 + 0.2);
+
+            osc.connect(filter);
+            filter.connect(gain);
             gain.connect(c.destination);
-            osc.start(c.currentTime + idx * 0.06);
-            osc.stop(c.currentTime + idx * 0.06 + 0.25);
+
+            osc.start(c.currentTime + idx * 0.05);
+            osc.stop(c.currentTime + idx * 0.05 + 0.2);
           });
         } catch(e){}
       },
@@ -789,25 +795,29 @@
           [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
             const osc = c.createOscillator();
             const gain = c.createGain();
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(freq, c.currentTime + idx * 0.08);
-            gain.gain.setValueAtTime(0.06, c.currentTime + idx * 0.08);
-            gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + idx * 0.08 + 0.35);
-            osc.connect(gain);
+            const filter = c.createBiquadFilter();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, c.currentTime + idx * 0.07);
+
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(2000, c.currentTime + idx * 0.07);
+
+            gain.gain.setValueAtTime(0.012, c.currentTime + idx * 0.07);
+            gain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + idx * 0.07 + 0.25);
+
+            osc.connect(filter);
+            filter.connect(gain);
             gain.connect(c.destination);
-            osc.start(c.currentTime + idx * 0.08);
-            osc.stop(c.currentTime + idx * 0.08 + 0.35);
+
+            osc.start(c.currentTime + idx * 0.07);
+            osc.stop(c.currentTime + idx * 0.07 + 0.25);
           });
         } catch(e){}
       }
     };
   })();
   window.AudioEngine = AudioEngine;
-
-  // Add hover sound listener to interactive buttons
-  document.querySelectorAll('.btn, .nav-link, .theme-swatch, .filter-tab, .skill-filter-tab, .term-pill').forEach(el => {
-    el.addEventListener('mouseenter', () => AudioEngine.playHover());
-  });
 
   /* 2. ACHIEVEMENTS & BADGES ENGINE */
   const AchievementManager = (function() {
@@ -915,7 +925,7 @@
     });
   }
 
-  /* 4. SPOTLIGHT COMMAND PALETTE (CMD + K) */
+  /* 4. SPOTLIGHT COMMAND PALETTE (CMD + K / CTRL + K) */
   (function initCmdPalette() {
     const modal = document.getElementById('commandPaletteModal');
     const backdrop = document.getElementById('cmdPaletteBackdrop');
@@ -961,7 +971,7 @@
       if (modal) modal.classList.add('active');
       if (searchInput) {
         searchInput.value = '';
-        searchInput.focus();
+        setTimeout(() => searchInput.focus(), 50);
       }
       renderResults('');
       AchievementManager.unlock('explorer');
@@ -970,6 +980,9 @@
     function closePalette() {
       if (modal) modal.classList.remove('active');
     }
+
+    window.openCmdPalette = openPalette;
+    window.closeCmdPalette = closePalette;
 
     function renderResults(query) {
       if (!resultsContainer) return;
@@ -1009,7 +1022,6 @@
           cmdEls.forEach(e => e.classList.remove('active'));
           el.classList.add('active');
           selectedIndex = idx;
-          AudioEngine.playHover();
         });
       });
     }
@@ -1028,7 +1040,6 @@
             selectedIndex = (selectedIndex + 1) % cmdEls.length;
             cmdEls[selectedIndex]?.classList.add('active');
             cmdEls[selectedIndex]?.scrollIntoView({ block: 'nearest' });
-            AudioEngine.playHover();
           }
         } else if (e.key === 'ArrowUp') {
           e.preventDefault();
@@ -1037,7 +1048,6 @@
             selectedIndex = (selectedIndex - 1 + cmdEls.length) % cmdEls.length;
             cmdEls[selectedIndex]?.classList.add('active');
             cmdEls[selectedIndex]?.scrollIntoView({ block: 'nearest' });
-            AudioEngine.playHover();
           }
         } else if (e.key === 'Enter') {
           e.preventDefault();
@@ -1046,15 +1056,21 @@
       });
     }
 
-    document.addEventListener('keydown', (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+    // Global Keydown Handler (Use capture phase so Chrome does not intercept Ctrl+K)
+    window.addEventListener('keydown', (e) => {
+      const isK = e.key === 'k' || e.key === 'K' || e.code === 'KeyK';
+      if ((e.metaKey || e.ctrlKey) && isK) {
         e.preventDefault();
-        if (modal && modal.classList.contains('active')) closePalette();
-        else openPalette();
+        e.stopPropagation();
+        if (modal && modal.classList.contains('active')) {
+          closePalette();
+        } else {
+          openPalette();
+        }
       } else if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
         closePalette();
       }
-    });
+    }, true);
   })();
 
   /* 5. PROJECT CATEGORY FILTER & DEEP DETAIL MODAL */
