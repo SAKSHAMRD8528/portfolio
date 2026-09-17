@@ -95,18 +95,19 @@
   background-size: 180px 180px;
 }
 
-/* ========== HERO GRID BACKGROUND ========== */
+/* ========== GLOBAL GRID BACKGROUND ========== */
 .hero-grid-bg {
-  position: absolute;
+  position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 0;
   pointer-events: none;
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 60px 60px;
-  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%);
-  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%);
+  opacity: 0.7;
 }
 
 /* ========== AMBIENT AURA LIGHT ORBS ========== */
@@ -1243,17 +1244,7 @@ body.cursor-hover .cursor-ring {
   padding-bottom: 60px;
 }
 
-.hero::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 220px;
-  background: linear-gradient(to bottom, transparent 0%, var(--bg-primary) 100%);
-  pointer-events: none;
-  z-index: 1;
-}
+
 
 #particleCanvas {
   position: fixed;
