@@ -870,39 +870,41 @@
       }
     }
 
-    const trophyBtn = document.getElementById('trophyDrawerBtn');
-    const modal = document.getElementById('achievementsModal');
-    const backdrop = document.getElementById('achieveModalBackdrop');
-    const closeBtn = document.getElementById('closeAchieveModal');
-    const grid = document.getElementById('achieveGrid');
-
-    function renderGrid() {
-      if (!grid) return;
-      grid.innerHTML = Object.values(badges).map(b => {
-        const isUnlocked = !!unlocked[b.id];
-        return `
-          <div class="achieve-card ${isUnlocked ? 'unlocked' : 'locked'}">
-            <div class="achieve-icon">${b.icon}</div>
-            <div>
-              <div class="achieve-title">${b.title} ${isUnlocked ? '✓' : '🔒'}</div>
-              <div class="achieve-desc">${b.desc}</div>
-            </div>
-          </div>
-        `;
-      }).join('');
+    function openAchievementsModal() {
+      AudioEngine.playClick();
+      renderGrid();
+      if (modal) {
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
     }
 
-    if (trophyBtn) {
-      trophyBtn.addEventListener('click', () => {
-        AudioEngine.playClick();
-        renderGrid();
-        if (modal) modal.classList.add('active');
-      });
+    function closeAchievementsModal() {
+      if (modal) {
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
     }
-    if (closeBtn) closeBtn.addEventListener('click', () => modal && modal.classList.remove('active'));
-    if (backdrop) backdrop.addEventListener('click', () => modal && modal.classList.remove('active'));
 
-    return { unlock };
+    window.openAchievementsModal = openAchievementsModal;
+    window.closeAchievementsModal = closeAchievementsModal;
+
+    // Render grid on initialization so data is ready
+    renderGrid();
+
+    if (trophyBtn) trophyBtn.addEventListener('click', openAchievementsModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeAchievementsModal);
+    if (backdrop) backdrop.addEventListener('click', closeAchievementsModal);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
+        closeAchievementsModal();
+      }
+    });
+
+    return { unlock, openModal: openAchievementsModal, closeModal: closeAchievementsModal };
   })();
   window.unlockAchievement = AchievementManager.unlock;
 
