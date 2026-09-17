@@ -3,7 +3,11 @@
    ============================================ */
 
 (function () {
-  function initMain() {
+  /* ===== FORCE START FROM BEGINNING (TOP OF PAGE) ===== */
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+  window.scrollTo(0, 0);
 
   /* ===== LOADING SCREEN ===== */
   const loadingScreen = document.getElementById('loadingScreen');
@@ -208,12 +212,11 @@
   const themeDropdown = document.getElementById('themeDropdown');
   const swatches     = document.querySelectorAll('.theme-swatch');
 
-  // Load saved settings
-  const savedMode  = localStorage.getItem('portfolioMode') || 'dark';
-  const savedTheme = localStorage.getItem('portfolioTheme') || 'cyber';
-
-  applyMode(savedMode);
-  applyTheme(savedTheme);
+  // Default theme is ALWAYS cyber, default mode is ALWAYS dark on refresh/load
+  applyMode('dark');
+  applyTheme('cyber');
+  localStorage.setItem('portfolioMode', 'dark');
+  localStorage.setItem('portfolioTheme', 'cyber');
 
   // --- Dark/Light Mode Toggle ---
   if (themeToggle) {
