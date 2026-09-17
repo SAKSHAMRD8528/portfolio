@@ -71,11 +71,6 @@
         <li><a href="Saksham_Dhumale_Master_Resume.pdf" class="nav-link nav-resume-link" data-open-resume="true">Resume</a></li>
       </ul>
       <div class="nav-actions">
-        <!-- Cmd + K Command Palette Trigger -->
-        <button class="cmd-k-trigger" id="cmdKeyBtn" aria-label="Open Command Palette" title="Search & Commands (Cmd + K)" onclick="window.openCmdPalette && window.openCmdPalette();">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <span class="cmd-k-pill"><kbd>⌘</kbd><kbd>K</kbd></span>
-        </button>
         <!-- Dark/Light Mode Toggle -->
         <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode">
           <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -887,25 +882,6 @@
             </div>
           </div>
         </div>
-  <!-- ========== SPOTLIGHT COMMAND PALETTE MODAL (CMD + K) ========== -->
-  <div class="cmd-palette-overlay" id="commandPaletteModal" aria-hidden="true" role="dialog" aria-modal="true">
-    <div class="cmd-palette-backdrop" id="cmdPaletteBackdrop"></div>
-    <div class="cmd-palette-container glass-card">
-      <div class="cmd-palette-search">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="cmdSearchInput" class="cmd-search-input" placeholder="Type a command, project, skill, or theme…" autocomplete="off" spellcheck="false" />
-        <span class="cmd-esc-badge"><kbd>ESC</kbd></span>
-      </div>
-      <div class="cmd-palette-results" id="cmdPaletteResults">
-        <!-- Results populated dynamically by JS -->
-      </div>
-      <div class="cmd-palette-footer">
-        <span>Navigation: <kbd>↑</kbd> <kbd>↓</kbd> Select: <kbd>↵</kbd> Exit: <kbd>ESC</kbd></span>
-        <span class="cmd-footer-logo">SD.</span>
-      </div>
-    </div>
-  </div>
-
   <!-- ========== DEEP PROJECT DETAIL MODAL ========== -->
   <div class="project-modal-overlay" id="projectDetailModal" aria-hidden="true" role="dialog" aria-modal="true">
     <div class="project-modal-backdrop" id="projectModalBackdrop"></div>
