@@ -284,10 +284,17 @@
       }
     };
 
+    let termCmdCount = 0;
+
     // Handle Command Execution
     function executeCommand(rawInput) {
       const input = rawInput.trim();
       if (!input) return;
+
+      termCmdCount++;
+      if (termCmdCount >= 3 && typeof window.unlockAchievement === 'function') {
+        window.unlockAchievement('terminal');
+      }
 
       commandHistory.push(input);
       historyIndex = commandHistory.length;

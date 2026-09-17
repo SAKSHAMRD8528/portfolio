@@ -688,6 +688,545 @@
       }
     });
   });
+
+  /* ============================================================
+     WORLD-CLASS INTERACTIVE ENGINES — AWARD-WINNING V37
+     ============================================================ */
+
+  /* 1. WEB AUDIO SFX ENGINE (Synthesized Audio) */
+  const AudioEngine = (function() {
+    let ctx = null;
+    let muted = localStorage.getItem('portfolioSoundMuted') === 'true';
+    const soundToggle = document.getElementById('soundToggle');
+
+    function getCtx() {
+      if (!ctx) {
+        ctx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (ctx.state === 'suspended') ctx.resume();
+      return ctx;
+    }
+
+    function updateUI() {
+      if (soundToggle) {
+        soundToggle.classList.toggle('muted', muted);
+        const iconOn = soundToggle.querySelector('.icon-sound-on');
+        const iconOff = soundToggle.querySelector('.icon-sound-off');
+        if (iconOn && iconOff) {
+          iconOn.style.display = muted ? 'none' : 'block';
+          iconOff.style.display = muted ? 'block' : 'none';
+        }
+      }
+    }
+    updateUI();
+
+    if (soundToggle) {
+      soundToggle.addEventListener('click', () => {
+        muted = !muted;
+        localStorage.setItem('portfolioSoundMuted', muted);
+        updateUI();
+        if (!muted) AudioEngine.playChime();
+      });
+    }
+
+    return {
+      playHover() {
+        if (muted) return;
+        try {
+          const c = getCtx();
+          const osc = c.createOscillator();
+          const gain = c.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(800, c.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(1200, c.currentTime + 0.05);
+          gain.gain.setValueAtTime(0.015, c.currentTime);
+          gain.gain.linearRampToValueAtTime(0.001, c.currentTime + 0.05);
+          osc.connect(gain);
+          gain.connect(c.destination);
+          osc.start();
+          osc.stop(c.currentTime + 0.05);
+        } catch(e){}
+      },
+      playClick() {
+        if (muted) return;
+        try {
+          const c = getCtx();
+          const osc = c.createOscillator();
+          const gain = c.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(450, c.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(150, c.currentTime + 0.06);
+          gain.gain.setValueAtTime(0.04, c.currentTime);
+          gain.gain.linearRampToValueAtTime(0.001, c.currentTime + 0.06);
+          osc.connect(gain);
+          gain.connect(c.destination);
+          osc.start();
+          osc.stop(c.currentTime + 0.06);
+        } catch(e){}
+      },
+      playChime() {
+        if (muted) return;
+        try {
+          const c = getCtx();
+          [523.25, 659.25, 783.99].forEach((freq, idx) => {
+            const osc = c.createOscillator();
+            const gain = c.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, c.currentTime + idx * 0.06);
+            gain.gain.setValueAtTime(0.03, c.currentTime + idx * 0.06);
+            gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + idx * 0.06 + 0.25);
+            osc.connect(gain);
+            gain.connect(c.destination);
+            osc.start(c.currentTime + idx * 0.06);
+            osc.stop(c.currentTime + idx * 0.06 + 0.25);
+          });
+        } catch(e){}
+      },
+      playAchievement() {
+        if (muted) return;
+        try {
+          const c = getCtx();
+          [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+            const osc = c.createOscillator();
+            const gain = c.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, c.currentTime + idx * 0.08);
+            gain.gain.setValueAtTime(0.06, c.currentTime + idx * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + idx * 0.08 + 0.35);
+            osc.connect(gain);
+            gain.connect(c.destination);
+            osc.start(c.currentTime + idx * 0.08);
+            osc.stop(c.currentTime + idx * 0.08 + 0.35);
+          });
+        } catch(e){}
+      }
+    };
+  })();
+  window.AudioEngine = AudioEngine;
+
+  // Add hover sound listener to interactive buttons
+  document.querySelectorAll('.btn, .nav-link, .theme-swatch, .filter-tab, .skill-filter-tab, .term-pill').forEach(el => {
+    el.addEventListener('mouseenter', () => AudioEngine.playHover());
+  });
+
+  /* 2. ACHIEVEMENTS & BADGES ENGINE */
+  const AchievementManager = (function() {
+    const badges = {
+      arcade: { id: 'arcade', icon: '🎮', title: 'Arcade Master', desc: 'Played one of Saksham’s mini games' },
+      terminal: { id: 'terminal', icon: '💻', title: 'Terminal Master', desc: 'Executed 3+ commands in the dev terminal' },
+      theme: { id: 'theme', icon: '🎨', title: 'Style Collector', desc: 'Explored custom color palettes' },
+      explorer: { id: 'explorer', icon: '🔍', title: 'Spotlight Explorer', desc: 'Opened the Cmd+K Command Palette' },
+      speed: { id: 'speed', icon: '⚡', title: 'Speed Reader', desc: 'Scrolled all the way to the footer' }
+    };
+
+    let unlocked = JSON.parse(localStorage.getItem('portfolioAchievements') || '{}');
+
+    function updateBadgeCount() {
+      const countEl = document.getElementById('trophyBadgeCount');
+      const total = Object.keys(badges).length;
+      const current = Object.keys(unlocked).length;
+      if (countEl) countEl.textContent = `${current}/${total}`;
+    }
+    updateBadgeCount();
+
+    function showToast(badge) {
+      AudioEngine.playAchievement();
+      const container = document.getElementById('achievementToastContainer');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      toast.className = 'achievement-toast';
+      toast.innerHTML = `
+        <div class="achievement-toast-icon">${badge.icon}</div>
+        <div>
+          <div class="toast-tag">TROPHY UNLOCKED!</div>
+          <div class="toast-title">${badge.title}</div>
+        </div>
+      `;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.animation = 'toastSlideIn 0.4s ease reverse forwards';
+        setTimeout(() => toast.remove(), 400);
+      }, 4000);
+    }
+
+    function unlock(id) {
+      if (!unlocked[id] && badges[id]) {
+        unlocked[id] = true;
+        localStorage.setItem('portfolioAchievements', JSON.stringify(unlocked));
+        updateBadgeCount();
+        showToast(badges[id]);
+      }
+    }
+
+    const trophyBtn = document.getElementById('trophyDrawerBtn');
+    const modal = document.getElementById('achievementsModal');
+    const backdrop = document.getElementById('achieveModalBackdrop');
+    const closeBtn = document.getElementById('closeAchieveModal');
+    const grid = document.getElementById('achieveGrid');
+
+    function renderGrid() {
+      if (!grid) return;
+      grid.innerHTML = Object.values(badges).map(b => {
+        const isUnlocked = !!unlocked[b.id];
+        return `
+          <div class="achieve-card ${isUnlocked ? 'unlocked' : 'locked'}">
+            <div class="achieve-icon">${b.icon}</div>
+            <div>
+              <div class="achieve-title">${b.title} ${isUnlocked ? '✓' : '🔒'}</div>
+              <div class="achieve-desc">${b.desc}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    if (trophyBtn) {
+      trophyBtn.addEventListener('click', () => {
+        AudioEngine.playClick();
+        renderGrid();
+        if (modal) modal.classList.add('active');
+      });
+    }
+    if (closeBtn) closeBtn.addEventListener('click', () => modal && modal.classList.remove('active'));
+    if (backdrop) backdrop.addEventListener('click', () => modal && modal.classList.remove('active'));
+
+    return { unlock };
+  })();
+  window.unlockAchievement = AchievementManager.unlock;
+
+  /* 3. 3D CARD PERSPECTIVE TILT EFFECT */
+  if (!isMobileDevice) {
+    document.querySelectorAll('.project-card, .skill-category, .testimonial-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = -((y - centerY) / centerY) * 5;
+        const rotateY = ((x - centerX) / centerX) * 5;
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+      });
+    });
+  }
+
+  /* 4. SPOTLIGHT COMMAND PALETTE (CMD + K) */
+  (function initCmdPalette() {
+    const modal = document.getElementById('commandPaletteModal');
+    const backdrop = document.getElementById('cmdPaletteBackdrop');
+    const searchInput = document.getElementById('cmdSearchInput');
+    const resultsContainer = document.getElementById('cmdPaletteResults');
+    const triggerBtn = document.getElementById('cmdKeyBtn');
+
+    let selectedIndex = 0;
+
+    const items = [
+      { category: 'Navigation', icon: '📍', title: 'About Saksham', desc: 'Jump to About section', action: () => scrollTo('#about') },
+      { category: 'Navigation', icon: '🛠️', title: 'Skills & Tech Stack', desc: 'Jump to Skills section', action: () => scrollTo('#skills') },
+      { category: 'Navigation', icon: '💼', title: 'Featured Projects', desc: 'Jump to Projects section', action: () => scrollTo('#projects') },
+      { category: 'Navigation', icon: '🎓', title: 'Education & Journey', desc: 'Jump to Experience section', action: () => scrollTo('#experience') },
+      { category: 'Navigation', icon: '📫', title: 'Get In Touch', desc: 'Jump to Contact section', action: () => scrollTo('#contact') },
+      { category: 'Navigation', icon: '📄', title: 'Resume Viewer', desc: 'Open PDF Resume', action: () => window.openResumeModal && window.openResumeModal() },
+      { category: 'Tools & Games', icon: '💻', title: 'Developer Terminal', desc: 'Launch interactive terminal window', action: () => window.openTerminalModal && window.openTerminalModal() },
+      { category: 'Tools & Games', icon: '🦖', title: 'Cyber Runner (Dino)', desc: 'Play Chrome Dino arcade game', action: () => window.openGameModal && window.openGameModal('dino') },
+      { category: 'Tools & Games', icon: '🚀', title: 'Space Blaster', desc: 'Play Space Shooter arcade game', action: () => window.openGameModal && window.openGameModal('space') },
+      { category: 'Tools & Games', icon: '🐍', title: 'Cyber Snake', desc: 'Play Retro Snake arcade game', action: () => window.openGameModal && window.openGameModal('snake') },
+      { category: 'Tools & Games', icon: '🏆', title: 'Achievements & Badges', desc: 'View unlocked trophies', action: () => document.getElementById('trophyDrawerBtn')?.click() },
+      { category: 'Themes', icon: '🎨', title: 'Cyber Theme', desc: 'Switch to Cyber Purple & Blue', action: () => setTheme('cyber') },
+      { category: 'Themes', icon: '💚', title: 'Matrix Theme', desc: 'Switch to Hacker Matrix Green', action: () => setTheme('matrix') },
+      { category: 'Themes', icon: '💖', title: 'Synthwave Theme', desc: 'Switch to Retro Neon Pink', action: () => setTheme('synthwave') },
+      { category: 'Themes', icon: '🌊', title: 'Ocean Theme', desc: 'Switch to Deep Oceanic Teal', action: () => setTheme('ocean') }
+    ];
+
+    function scrollTo(id) {
+      closePalette();
+      const target = document.querySelector(id);
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function setTheme(themeName) {
+      closePalette();
+      document.documentElement.setAttribute('data-theme', themeName);
+      localStorage.setItem('portfolioTheme', themeName);
+      AchievementManager.unlock('theme');
+    }
+
+    function openPalette() {
+      AudioEngine.playClick();
+      if (modal) modal.classList.add('active');
+      if (searchInput) {
+        searchInput.value = '';
+        searchInput.focus();
+      }
+      renderResults('');
+      AchievementManager.unlock('explorer');
+    }
+
+    function closePalette() {
+      if (modal) modal.classList.remove('active');
+    }
+
+    function renderResults(query) {
+      if (!resultsContainer) return;
+      const q = query.toLowerCase().trim();
+      const filtered = items.filter(item =>
+        item.title.toLowerCase().includes(q) ||
+        item.desc.toLowerCase().includes(q) ||
+        item.category.toLowerCase().includes(q)
+      );
+
+      if (filtered.length === 0) {
+        resultsContainer.innerHTML = `<div style="padding: 30px; text-align: center; color: rgba(255,255,255,0.4); font-family: 'JetBrains Mono', monospace;">No results found for "${query}"</div>`;
+        return;
+      }
+
+      selectedIndex = 0;
+      resultsContainer.innerHTML = filtered.map((item, idx) => `
+        <div class="cmd-item ${idx === 0 ? 'active' : ''}" data-idx="${idx}">
+          <div class="cmd-item-left">
+            <div class="cmd-item-icon">${item.icon}</div>
+            <div>
+              <div class="cmd-item-title">${item.title}</div>
+              <div class="cmd-item-desc">${item.desc}</div>
+            </div>
+          </div>
+          <div class="cmd-esc-badge"><kbd>${item.category}</kbd></div>
+        </div>
+      `).join('');
+
+      const cmdEls = resultsContainer.querySelectorAll('.cmd-item');
+      cmdEls.forEach((el, idx) => {
+        el.addEventListener('click', () => {
+          AudioEngine.playClick();
+          filtered[idx].action();
+        });
+        el.addEventListener('mouseenter', () => {
+          cmdEls.forEach(e => e.classList.remove('active'));
+          el.classList.add('active');
+          selectedIndex = idx;
+          AudioEngine.playHover();
+        });
+      });
+    }
+
+    if (triggerBtn) triggerBtn.addEventListener('click', openPalette);
+    if (backdrop) backdrop.addEventListener('click', closePalette);
+
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => renderResults(e.target.value));
+      searchInput.addEventListener('keydown', (e) => {
+        const cmdEls = resultsContainer.querySelectorAll('.cmd-item');
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (cmdEls.length > 0) {
+            cmdEls[selectedIndex]?.classList.remove('active');
+            selectedIndex = (selectedIndex + 1) % cmdEls.length;
+            cmdEls[selectedIndex]?.classList.add('active');
+            cmdEls[selectedIndex]?.scrollIntoView({ block: 'nearest' });
+            AudioEngine.playHover();
+          }
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (cmdEls.length > 0) {
+            cmdEls[selectedIndex]?.classList.remove('active');
+            selectedIndex = (selectedIndex - 1 + cmdEls.length) % cmdEls.length;
+            cmdEls[selectedIndex]?.classList.add('active');
+            cmdEls[selectedIndex]?.scrollIntoView({ block: 'nearest' });
+            AudioEngine.playHover();
+          }
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          cmdEls[selectedIndex]?.click();
+        }
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        if (modal && modal.classList.contains('active')) closePalette();
+        else openPalette();
+      } else if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
+        closePalette();
+      }
+    });
+  })();
+
+  /* 5. PROJECT CATEGORY FILTER & DEEP DETAIL MODAL */
+  (function initProjectCategoryAndModal() {
+    const filterTabs = document.querySelectorAll('#projectFilterBar .filter-tab');
+    const projectCards = document.querySelectorAll('#projectsGrid .project-card');
+
+    filterTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        AudioEngine.playClick();
+        filterTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        const category = tab.getAttribute('data-filter');
+        projectCards.forEach(card => {
+          const cardCat = card.getAttribute('data-category');
+          if (category === 'all' || cardCat === category) {
+            card.style.display = 'block';
+            card.style.animation = 'fadeIn 0.4s ease forwards';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    const modal = document.getElementById('projectDetailModal');
+    const backdrop = document.getElementById('projectModalBackdrop');
+    const closeBtn = document.getElementById('closeProjectModal');
+    const headerContainer = document.getElementById('projectModalHeader');
+    const bodyContainer = document.getElementById('projectModalBody');
+
+    const projectDetailsData = {
+      '1': {
+        title: 'Endometrium Cancer Detection System',
+        tags: ['Flask', 'CNN', 'OpenCV', 'TensorFlow', 'Python'],
+        desc: 'An end-to-end medical AI application engineered to assist pathologists in accurately detecting and classifying endometrial carcinoma from biopsy histopathological slides.',
+        highlights: [
+          'Achieved high accuracy leveraging custom Deep Convolutional Neural Network architectures trained on augmented histopathological dataset.',
+          'Integrated OpenCV preprocessing pipelines for contrast enhancement, noise reduction, and adaptive thresholding.',
+          'Built lightweight interactive Web UI using Flask to allow medical users to upload high-res images and get instant heatmap diagnostics.'
+        ],
+        github: 'https://github.com/SAKSHAMRD8528/endometrium-cancer-detection'
+      },
+      '2': {
+        title: 'Pizza Sales Business Analytics Engine',
+        tags: ['MySQL', 'Python', 'Pandas', 'Plotly', 'Data Analytics'],
+        desc: 'A comprehensive data analytics pipeline designed to extract strategic operational insights from multi-thousand row restaurant transactional databases.',
+        highlights: [
+          'Wrote 25+ optimized SQL queries featuring window functions, aggregations, and subqueries to calculate Average Order Value, Revenue by Category, and Hourly Order Volume.',
+          'Created interactive visual dashboards in Python demonstrating peak dining trends, order size distribution, and top-performing menu items.',
+          'Formulated actionable recommendations for inventory optimization and targeted promotional campaigns.'
+        ],
+        github: 'https://github.com/SAKSHAMRD8528'
+      },
+      '3': {
+        title: 'Cyber Multi-Agent Framework',
+        tags: ['Python', 'LLM Orchestration', 'REST API', 'AsyncIO'],
+        desc: 'High-performance asynchronous agent orchestrator that coordinates automated research subagents, code generation tools, and self-healing execution loops.',
+        highlights: [
+          'Designed decoupled agent communication layer for agent-to-agent task delegation and state sync.',
+          'Implemented automated retry & error rollback mechanisms to maintain robust long-running task completion.',
+          'Built custom CLI terminal bindings and RESTful WebSocket endpoints for live monitoring.'
+        ],
+        github: 'https://github.com/SAKSHAMRD8528'
+      }
+    };
+
+    document.querySelectorAll('[data-open-project-modal="true"], .btn-deep-modal').forEach(trigger => {
+      trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        const card = trigger.closest('.project-card');
+        if (!card) return;
+        const pId = card.getAttribute('data-project-id');
+        const data = projectDetailsData[pId];
+        if (!data) return;
+
+        AudioEngine.playClick();
+
+        if (headerContainer && bodyContainer) {
+          headerContainer.innerHTML = `
+            <div class="pm-header-tags">${data.tags.map(t => `<span class="project-tag">${t}</span>`).join('')}</div>
+            <h2 class="pm-title">${data.title}</h2>
+          `;
+          bodyContainer.innerHTML = `
+            <div class="pm-section-label">Problem Statement &amp; Overview</div>
+            <p class="pm-desc">${data.desc}</p>
+            <div class="pm-section-label">Key Engineering Highlights</div>
+            <ul class="pm-highlights-list">
+              ${data.highlights.map(h => `<li>${h}</li>`).join('')}
+            </ul>
+            <div class="pm-actions">
+              <a href="${data.github}" target="_blank" rel="noopener" class="btn btn-primary magnetic-btn">
+                <span>View Full Source Code on GitHub →</span>
+              </a>
+            </div>
+          `;
+        }
+
+        if (modal) modal.classList.add('active');
+      });
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', () => modal && modal.classList.remove('active'));
+    if (backdrop) backdrop.addEventListener('click', () => modal && modal.classList.remove('active'));
+  })();
+
+  /* 6. SKILL CATEGORY FILTER & CONTACT FEATURES */
+  (function initSkillFilterAndContact() {
+    const skillTabs = document.querySelectorAll('#skillFilterBar .skill-filter-tab');
+    const skillCategories = document.querySelectorAll('.skills-grid .skill-category');
+
+    skillTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        AudioEngine.playClick();
+        skillTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        const filter = tab.getAttribute('data-skill-filter');
+        skillCategories.forEach(cat => {
+          const catKey = cat.getAttribute('data-skill-category');
+          if (filter === 'all' || catKey === filter) {
+            cat.style.display = 'block';
+            cat.style.animation = 'fadeIn 0.3s ease forwards';
+          } else {
+            cat.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Contact Quick Copy
+    document.querySelectorAll('.contact-copy-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const text = item.getAttribute('data-copy-text');
+        const badge = item.querySelector('.contact-copy-badge');
+        if (text) {
+          navigator.clipboard.writeText(text);
+          AudioEngine.playChime();
+          if (badge) {
+            const orig = badge.textContent;
+            badge.textContent = 'Copied! ✓';
+            badge.classList.add('copied');
+            setTimeout(() => {
+              badge.textContent = orig;
+              badge.classList.remove('copied');
+            }, 2000);
+          }
+        }
+      });
+    });
+
+    // Live Local IST Clock
+    const clockEl = document.getElementById('localTimeClock');
+    function updateClock() {
+      if (!clockEl) return;
+      const now = new Date();
+      const options = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+      clockEl.textContent = `${now.toLocaleTimeString('en-US', options)} (IST)`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Footer scroll tracking for Speed Reader achievement
+    let footerReached = false;
+    window.addEventListener('scroll', () => {
+      if (!footerReached && (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
+        footerReached = true;
+        AchievementManager.unlock('speed');
+      }
+    });
+  })();
 }
 
   if (document.readyState === 'loading') {
@@ -696,3 +1235,4 @@
     initMain();
   }
 })();
+

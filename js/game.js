@@ -8,6 +8,7 @@
 
   // Global helper available immediately
   window.openGameModal = function (game = 'dino') {
+    if (typeof window.unlockAchievement === 'function') window.unlockAchievement('arcade');
     if (typeof openGameModalFn === 'function') {
       openGameModalFn(game);
     } else {
