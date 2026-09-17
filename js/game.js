@@ -1,5 +1,6 @@
 /* ============================================
-   GAME.JS — Dual Cyber Arcade (Dino & Space Blaster)
+   GAME.JS — Dual Cyber Arcade (Dino, Space Blaster & Snake)
+   v36 — Leaderboard Edition
    ============================================ */
 
 (function () {
@@ -16,58 +17,165 @@
     }
   };
 
+  /* ==========================================
+     LEADERBOARD SYSTEM
+     ========================================== */
+  const LB_KEYS = {
+    dino:  'chromeDinoLeaderboard',
+    space: 'spaceBlasterLeaderboard',
+    snake: 'cyberSnakeLeaderboard'
+  };
+
+  function getLeaderboard(gameKey) {
+    try {
+      const raw = localStorage.getItem(LB_KEYS[gameKey]);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveLeaderboard(gameKey, lb) {
+    try {
+      localStorage.setItem(LB_KEYS[gameKey], JSON.stringify(lb));
+    } catch (e) {}
+  }
+
+  function getTopScore(gameKey) {
+    const lb = getLeaderboard(gameKey);
+    return lb.length > 0 ? lb[0].score : 0;
+  }
+
+  function getTopHolder(gameKey) {
+    const lb = getLeaderboard(gameKey);
+    return lb.length > 0 ? lb[0].name : '';
+  }
+
+  /* Returns true if score qualifies for leaderboard (top 5) */
+  function qualifiesForLeaderboard(gameKey, score) {
+    if (score <= 0) return false;
+    const lb = getLeaderboard(gameKey);
+    if (lb.length < 5) return true;
+    return score > lb[lb.length - 1].score;
+  }
+
+  function addToLeaderboard(gameKey, name, score) {
+    const lb = getLeaderboard(gameKey);
+    const date = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+    lb.push({ name: name.trim() || 'Player', score, date });
+    lb.sort((a, b) => b.score - a.score);
+    const trimmed = lb.slice(0, 5);
+    saveLeaderboard(gameKey, trimmed);
+    return trimmed;
+  }
+
+  const MEDALS = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+
+  function renderLeaderboard(list, olEl) {
+    if (!olEl) return;
+    olEl.innerHTML = '';
+    if (list.length === 0) {
+      olEl.innerHTML = '<li class="lb-empty">No scores yet — be the first!</li>';
+      return;
+    }
+    list.forEach((entry, i) => {
+      const li = document.createElement('li');
+      li.className = 'lb-row';
+      li.style.animationDelay = `${i * 0.07}s`;
+      li.innerHTML = `
+        <span class="lb-medal">${MEDALS[i] || '#' + (i + 1)}</span>
+        <span class="lb-name">${escapeHTML(entry.name)}</span>
+        <span class="lb-score">${String(entry.score).padStart(5, '0')}</span>
+        <span class="lb-date">${entry.date || ''}</span>
+      `;
+      olEl.appendChild(li);
+    });
+  }
+
+  function escapeHTML(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  /* ==========================================
+     MAIN GAME INIT
+     ========================================== */
   function initGame() {
-    const gameModal = document.getElementById('gameModal');
-    const gameModalBackdrop = document.getElementById('gameModalBackdrop');
-    const closeGameBtns = document.querySelectorAll('#closeGameBtn, #closeGameIconBtn');
-    const openGameTriggers = document.querySelectorAll('[data-open-game]');
+    const gameModal            = document.getElementById('gameModal');
+    const gameModalBackdrop    = document.getElementById('gameModalBackdrop');
+    const closeGameBtns        = document.querySelectorAll('#closeGameBtn, #closeGameIconBtn');
+    const openGameTriggers     = document.querySelectorAll('[data-open-game]');
 
     const canvas = document.getElementById('arcadeCanvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    const tabDino = document.getElementById('tabDino');
+    const tabDino  = document.getElementById('tabDino');
     const tabSpace = document.getElementById('tabSpace');
     const tabSnake = document.getElementById('tabSnake');
 
-    const scoreEl = document.getElementById('gameScore');
-    const highScoreEl = document.getElementById('gameHighScore');
-    const livesEl = document.getElementById('gameLives');
-    const livesWrapper = document.getElementById('hudLivesWrapper');
-    const restartBtn = document.getElementById('gameRestartBtn');
-    const overlayScreen = document.getElementById('gameOverOverlay');
-    const overlaySubtitle = document.getElementById('gameOverSubtitle');
-    const instructionsEl = document.getElementById('gameInstructions');
+    const scoreEl            = document.getElementById('gameScore');
+    const highScoreEl        = document.getElementById('gameHighScore');
+    const highScoreHolderEl  = document.getElementById('gameHighScoreHolder');
+    const livesEl            = document.getElementById('gameLives');
+    const livesWrapper       = document.getElementById('hudLivesWrapper');
+    const restartBtn         = document.getElementById('gameRestartBtn');
+    const overlayScreen      = document.getElementById('gameOverOverlay');
+    const overlaySubtitle    = document.getElementById('gameOverSubtitle');
+    const instructionsEl     = document.getElementById('gameInstructions');
 
-    const dinoControls = document.getElementById('dinoTouchControls');
+    // Leaderboard UI
+    const scoreNameEntry   = document.getElementById('scoreNameEntry');
+    const scoreNameInput   = document.getElementById('scoreNameInput');
+    const submitScoreBtn   = document.getElementById('submitScoreBtn');
+    const gameoverLbList   = document.getElementById('gameoverLbList');
+    const gameoverLeaderboard = document.getElementById('gameoverLeaderboard');
+    const leaderboardPanel = document.getElementById('gameLeaderboardPanel');
+    const lbPanelList      = document.getElementById('lbPanelList');
+    const hudLbBtn         = document.getElementById('hudLeaderboardBtn');
+    const closeLbPanel     = document.getElementById('closeLbPanel');
+
+    // Touch controls
+    const dinoControls  = document.getElementById('dinoTouchControls');
     const spaceControls = document.getElementById('spaceTouchControls');
     const snakeControls = document.getElementById('snakeTouchControls');
 
-    const touchDuckBtn = document.getElementById('touchDuckBtn');
-    const touchJumpBtn = document.getElementById('touchJumpBtn');
-    const touchLeftBtn = document.getElementById('touchLeftBtn');
+    const touchDuckBtn  = document.getElementById('touchDuckBtn');
+    const touchJumpBtn  = document.getElementById('touchJumpBtn');
+    const touchLeftBtn  = document.getElementById('touchLeftBtn');
     const touchRightBtn = document.getElementById('touchRightBtn');
-    const touchFireBtn = document.getElementById('touchFireBtn');
+    const touchFireBtn  = document.getElementById('touchFireBtn');
 
-    const touchSnakeUp = document.getElementById('touchSnakeUp');
-    const touchSnakeDown = document.getElementById('touchSnakeDown');
-    const touchSnakeLeft = document.getElementById('touchSnakeLeft');
+    const touchSnakeUp    = document.getElementById('touchSnakeUp');
+    const touchSnakeDown  = document.getElementById('touchSnakeDown');
+    const touchSnakeLeft  = document.getElementById('touchSnakeLeft');
     const touchSnakeRight = document.getElementById('touchSnakeRight');
 
     let currentGame = 'dino'; // 'dino' | 'space' | 'snake'
     let animationFrameId = null;
-    let isRunning = false;
+    let isRunning  = false;
     let isGameOver = false;
 
-    // Web Audio Synth for 8-bit Sound Effects
+    // Pending score waiting for name entry
+    let pendingScore = 0;
+    let pendingGameKey = '';
+
+    /* ==========================================
+       WEB AUDIO SYNTH
+       ========================================== */
     let audioCtx = null;
     function playSound(type) {
       try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') audioCtx.resume();
 
-        const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
+        const now  = audioCtx.currentTime;
+        const osc  = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.connect(gain);
         gain.connect(audioCtx.destination);
@@ -78,57 +186,60 @@
           osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
           gain.gain.setValueAtTime(0.15, now);
           gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
-          osc.start(now);
-          osc.stop(now + 0.1);
+          osc.start(now); osc.stop(now + 0.1);
         } else if (type === 'laser') {
           osc.type = 'sawtooth';
           osc.frequency.setValueAtTime(880, now);
           osc.frequency.exponentialRampToValueAtTime(110, now + 0.1);
           gain.gain.setValueAtTime(0.12, now);
           gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
-          osc.start(now);
-          osc.stop(now + 0.1);
+          osc.start(now); osc.stop(now + 0.1);
         } else if (type === 'score') {
           osc.type = 'square';
           osc.frequency.setValueAtTime(659.25, now);
           osc.frequency.setValueAtTime(880, now + 0.08);
           gain.gain.setValueAtTime(0.18, now);
           gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
-          osc.start(now);
-          osc.stop(now + 0.2);
+          osc.start(now); osc.stop(now + 0.2);
         } else if (type === 'hit') {
           osc.type = 'sawtooth';
           osc.frequency.setValueAtTime(160, now);
           osc.frequency.exponentialRampToValueAtTime(30, now + 0.25);
           gain.gain.setValueAtTime(0.3, now);
           gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
-          osc.start(now);
-          osc.stop(now + 0.25);
+          osc.start(now); osc.stop(now + 0.25);
         } else if (type === 'eat') {
           osc.type = 'triangle';
           osc.frequency.setValueAtTime(523.25, now);
           osc.frequency.exponentialRampToValueAtTime(1046.5, now + 0.08);
           gain.gain.setValueAtTime(0.2, now);
           gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
-          osc.start(now);
-          osc.stop(now + 0.08);
+          osc.start(now); osc.stop(now + 0.08);
         } else if (type === 'powerup') {
           osc.type = 'sine';
           osc.frequency.setValueAtTime(330, now);
           osc.frequency.exponentialRampToValueAtTime(1320, now + 0.2);
           gain.gain.setValueAtTime(0.25, now);
           gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
-          osc.start(now);
-          osc.stop(now + 0.2);
+          osc.start(now); osc.stop(now + 0.2);
+        } else if (type === 'newhi') {
+          // Fanfare: two-tone rise
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(783.99, now + 0.15);
+          osc.frequency.setValueAtTime(1046.5, now + 0.3);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
+          osc.start(now); osc.stop(now + 0.5);
         }
-      } catch (e) {
-        // Audio fallback
-      }
+      } catch (e) { /* Audio fallback */ }
     }
 
-    // Canvas Dimensions with safe fallbacks
-    let width = 640;
-    let height = 240;
+    /* ==========================================
+       CANVAS DIMENSIONS
+       ========================================== */
+    let width   = 640;
+    let height  = 240;
     let GROUND_Y = 200;
 
     function resizeCanvas() {
@@ -137,62 +248,154 @@
       if (container && container.clientWidth > 50) {
         containerWidth = container.clientWidth;
       } else if (window.innerWidth) {
-        containerWidth = Math.min(window.innerWidth - 30, 680);
+        containerWidth = Math.min(window.innerWidth - 20, 700);
       }
-      width = Math.max(300, Math.min(containerWidth - 4, 700));
-      height = currentGame === 'dino' ? 240 : currentGame === 'space' ? 340 : 320;
+      width  = Math.max(280, Math.min(containerWidth, 700));
+
+      // Cap height on mobile so controls stay visible
+      const isMobile = window.innerWidth <= 768;
+      const maxH = isMobile ? Math.min(window.innerHeight * 0.4, 260) : 9999;
+
+      if (currentGame === 'dino') {
+        height = Math.min(240, maxH);
+      } else if (currentGame === 'space') {
+        height = Math.min(340, maxH);
+      } else {
+        height = Math.min(320, maxH);
+      }
+
       GROUND_Y = height - 35;
-      canvas.width = width;
+      canvas.width  = width;
       canvas.height = height;
+    }
+
+    /* ==========================================
+       HUD HELPERS
+       ========================================== */
+    function updateHUD(gameKey) {
+      const hi     = getTopScore(gameKey);
+      const holder = getTopHolder(gameKey);
+      if (highScoreEl)       highScoreEl.textContent = String(hi).padStart(5, '0');
+      if (highScoreHolderEl) highScoreHolderEl.textContent = holder ? `by ${holder}` : '';
+    }
+
+    function flashScore() {
+      if (!scoreEl) return;
+      scoreEl.classList.add('score-flash');
+      setTimeout(() => scoreEl.classList.remove('score-flash'), 300);
+    }
+
+    /* ==========================================
+       LEADERBOARD UI HELPERS
+       ========================================== */
+    function showGameoverLeaderboard(gameKey, finalScore) {
+      const lb = getLeaderboard(gameKey);
+      renderLeaderboard(lb, gameoverLbList);
+      if (gameoverLeaderboard) gameoverLeaderboard.style.display = 'block';
+
+      const qualifies = qualifiesForLeaderboard(gameKey, finalScore);
+      if (qualifies && finalScore > 0) {
+        pendingScore   = finalScore;
+        pendingGameKey = gameKey;
+        if (scoreNameEntry) scoreNameEntry.style.display = 'flex';
+        if (scoreNameInput) {
+          scoreNameInput.value = '';
+          setTimeout(() => scoreNameInput.focus(), 200);
+        }
+        playSound('newhi');
+      } else {
+        if (scoreNameEntry) scoreNameEntry.style.display = 'none';
+      }
+    }
+
+    function commitScore(name) {
+      if (!pendingGameKey || pendingScore <= 0) return;
+      const lb = addToLeaderboard(pendingGameKey, name, pendingScore);
+      renderLeaderboard(lb, gameoverLbList);
+      updateHUD(pendingGameKey);
+      if (scoreNameEntry) scoreNameEntry.style.display = 'none';
+      pendingScore   = 0;
+      pendingGameKey = '';
+    }
+
+    function showFullLeaderboard(gameKey) {
+      const lb = getLeaderboard(gameKey);
+      renderLeaderboard(lb, lbPanelList);
+      if (leaderboardPanel) leaderboardPanel.style.display = 'flex';
+    }
+
+    function hideFullLeaderboard() {
+      if (leaderboardPanel) leaderboardPanel.style.display = 'none';
+    }
+
+    // Submit score handlers
+    if (submitScoreBtn) {
+      submitScoreBtn.addEventListener('click', () => {
+        const name = scoreNameInput ? scoreNameInput.value.trim() : 'Player';
+        commitScore(name || 'Player');
+      });
+    }
+    if (scoreNameInput) {
+      scoreNameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const name = scoreNameInput.value.trim();
+          commitScore(name || 'Player');
+        }
+      });
+    }
+
+    // Leaderboard panel toggle
+    if (hudLbBtn) {
+      hudLbBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showFullLeaderboard(currentGame);
+      });
+    }
+    if (closeLbPanel) {
+      closeLbPanel.addEventListener('click', (e) => {
+        e.stopPropagation();
+        hideFullLeaderboard();
+      });
     }
 
     /* ==========================================
        GAME 1: CHROME DINO RUNNER
        ========================================== */
-    let dinoScore = 0;
-    let dinoRawScore = 0;
-    let dinoHighScore = parseInt(localStorage.getItem('chromeDinoHighScore') || '0', 10);
-    let dinoSpeed = 6.5;
+    let dinoScore      = 0;
+    let dinoRawScore   = 0;
+    let dinoSpeed      = 6.5;
     let dinoLastMilestone = 0;
-    let dinoIsNight = false;
+    let dinoIsNight    = false;
 
-    let dinoClouds = [];
+    let dinoClouds       = [];
     let dinoGroundOffset = 0;
-    let dinoGroundBumps = [];
+    let dinoGroundBumps  = [];
 
     const dino = {
-      x: 45,
-      y: 156,
-      baseY: 156,
-      width: 40,
-      height: 44,
-      duckHeight: 26,
-      vy: 0,
-      gravity: 0.65,
-      jumpPower: -11.5,
-      isGrounded: true,
-      isDucking: false,
-      legState: 0,
-      stepTimer: 0,
-      isDead: false
+      x: 45, y: 156, baseY: 156,
+      width: 40, height: 44, duckHeight: 26,
+      vy: 0, gravity: 0.65, jumpPower: -11.5,
+      isGrounded: true, isDucking: false,
+      legState: 0, stepTimer: 0, isDead: false
     };
 
     let dinoObstacles = [];
 
     function initDino() {
-      dinoScore = 0;
-      dinoRawScore = 0;
-      dinoSpeed = 6.5;
+      dinoScore         = 0;
+      dinoRawScore      = 0;
+      dinoSpeed         = 6.5;
       dinoLastMilestone = 0;
-      dinoIsNight = false;
-      dinoGroundOffset = 0;
+      dinoIsNight       = false;
+      dinoGroundOffset  = 0;
 
-      dino.y = GROUND_Y - 44;
-      dino.baseY = GROUND_Y - 44;
-      dino.vy = 0;
+      dino.y         = GROUND_Y - 44;
+      dino.baseY     = GROUND_Y - 44;
+      dino.vy        = 0;
       dino.isGrounded = true;
-      dino.isDucking = false;
-      dino.isDead = false;
+      dino.isDucking  = false;
+      dino.isDead     = false;
 
       dinoClouds = [
         { x: 100, y: 35, speed: 0.6, width: 46 },
@@ -203,7 +406,7 @@
       dinoGroundBumps = [];
       for (let x = 0; x < 900; x += 30 + Math.random() * 40) {
         dinoGroundBumps.push({
-          x: x,
+          x,
           length: 4 + Math.random() * 12,
           yOffset: Math.random() > 0.5 ? 4 : 8
         });
@@ -215,52 +418,25 @@
     function spawnDinoObstacle() {
       const canSpawnBird = dinoScore > 120;
       const rand = Math.random();
-
-      let type = 'small_cactus';
-      let obsWidth = 16;
-      let obsHeight = 34;
-      let obsY = GROUND_Y - 34;
+      let type = 'small_cactus', obsWidth = 16, obsHeight = 34, obsY = GROUND_Y - 34;
 
       if (canSpawnBird && rand > 0.72) {
-        type = 'bird';
-        obsWidth = 38;
-        obsHeight = 24;
+        type = 'bird'; obsWidth = 38; obsHeight = 24;
         const altType = Math.random();
-        if (altType < 0.35) {
-          obsY = GROUND_Y - 24;
-        } else if (altType < 0.7) {
-          obsY = GROUND_Y - 52;
-        } else {
-          obsY = GROUND_Y - 80;
-        }
+        if      (altType < 0.35) obsY = GROUND_Y - 24;
+        else if (altType < 0.7)  obsY = GROUND_Y - 52;
+        else                     obsY = GROUND_Y - 80;
       } else if (rand > 0.45) {
-        type = 'tall_cactus';
-        obsWidth = 22;
-        obsHeight = 44;
-        obsY = GROUND_Y - 44;
+        type = 'tall_cactus';   obsWidth = 22; obsHeight = 44; obsY = GROUND_Y - 44;
       } else if (rand > 0.25) {
-        type = 'double_cactus';
-        obsWidth = 32;
-        obsHeight = 34;
-        obsY = GROUND_Y - 34;
+        type = 'double_cactus'; obsWidth = 32; obsHeight = 34; obsY = GROUND_Y - 34;
       }
 
-      dinoObstacles.push({
-        type,
-        x: width + 20,
-        y: obsY,
-        width: obsWidth,
-        height: obsHeight,
-        frame: 0,
-        frameTimer: 0
-      });
+      dinoObstacles.push({ type, x: width + 20, y: obsY, width: obsWidth, height: obsHeight, frame: 0, frameTimer: 0 });
     }
 
     function dinoJump() {
-      if (isGameOver || !isRunning) {
-        resetActiveGame();
-        return;
-      }
+      if (isGameOver || !isRunning) { resetActiveGame(); return; }
       if (dino.isGrounded) {
         dino.vy = dino.jumpPower;
         dino.isGrounded = false;
@@ -271,34 +447,24 @@
     function dinoDuck(active) {
       if (dino.isDead) return;
       dino.isDucking = active;
-      if (active && !dino.isGrounded) {
-        dino.vy += 2.5;
-      }
+      if (active && !dino.isGrounded) dino.vy += 2.5;
     }
 
     function checkDinoCollision(d, obs) {
-      const padX = 4;
-      const padY = 4;
+      const padX = 4, padY = 4;
       const dHeight = d.isDucking ? d.duckHeight : d.height;
-      const dY = d.isDucking ? (GROUND_Y - d.duckHeight) : d.y;
-
-      const dLeft = d.x + padX;
-      const dRight = d.x + d.width - padX;
-      const dTop = dY + padY;
-      const dBottom = dY + dHeight;
-
-      const obsLeft = obs.x + padX;
-      const obsRight = obs.x + obs.width - padX;
-      const obsTop = obs.y + padY;
-      const obsBottom = obs.y + obs.height;
-
-      return !(dRight < obsLeft || dLeft > obsRight || dBottom < obsTop || dTop > obsBottom);
+      const dY      = d.isDucking ? (GROUND_Y - d.duckHeight) : d.y;
+      return !(
+        (d.x + d.width - padX) < (obs.x + padX)  ||
+        (d.x + padX) > (obs.x + obs.width - padX) ||
+        (dY + dHeight) < (obs.y + padY)            ||
+        (dY + padY) > (obs.y + obs.height)
+      );
     }
 
     function drawDinoSprite() {
       const fgColor = dinoIsNight ? '#00d4ff' : '#27c93f';
       ctx.fillStyle = fgColor;
-
       const dY = dino.isDucking ? (GROUND_Y - dino.duckHeight) : dino.y;
       const dX = dino.x;
 
@@ -333,7 +499,6 @@
         ctx.fillRect(dX + 32, dY + 19, 2, 4);
         ctx.fillRect(dX, dY + 18, 8, 10);
         ctx.fillRect(dX - 4, dY + 14, 6, 8);
-
         if (!dino.isGrounded || dino.isDead) {
           ctx.fillRect(dX + 12, dY + 34, 4, 10);
           ctx.fillRect(dX + 20, dY + 34, 4, 10);
@@ -354,8 +519,7 @@
     function drawDinoObstacle(obs) {
       if (obs.type === 'bird') {
         ctx.fillStyle = dinoIsNight ? '#ffbd2e' : '#00d4ff';
-        const bX = obs.x;
-        const bY = obs.y;
+        const bX = obs.x, bY = obs.y;
         ctx.fillRect(bX + 8, bY + 8, 20, 8);
         ctx.fillRect(bX, bY + 10, 8, 4);
         ctx.fillStyle = '#080c14';
@@ -398,19 +562,20 @@
       ctx.fillRect(0, 0, width, height);
 
       dinoRawScore += 0.15;
-      dinoScore = Math.floor(dinoRawScore);
+      dinoScore     = Math.floor(dinoRawScore);
       if (scoreEl) scoreEl.textContent = String(dinoScore).padStart(5, '0');
 
       dinoIsNight = Math.floor(dinoScore / 500) % 2 === 1;
-      dinoSpeed = 6.5 + Math.min(dinoScore * 0.006, 7.5);
+      dinoSpeed   = 6.5 + Math.min(dinoScore * 0.006, 7.5);
 
       if (dinoScore > 0 && dinoScore % 100 === 0 && dinoScore !== dinoLastMilestone) {
         dinoLastMilestone = dinoScore;
         playSound('score');
+        flashScore();
       }
 
       // Clouds
-      ctx.fillStyle = dinoIsNight ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.25)';
+      ctx.fillStyle = dinoIsNight ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.25)';
       for (const c of dinoClouds) {
         c.x -= c.speed;
         if (c.x + c.width < 0) c.x = width + Math.random() * 80;
@@ -420,106 +585,72 @@
 
       // Ground
       dinoGroundOffset += dinoSpeed;
-      ctx.strokeStyle = dinoIsNight ? 'rgba(0, 212, 255, 0.4)' : 'rgba(255, 255, 255, 0.35)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(0, GROUND_Y);
-      ctx.lineTo(width, GROUND_Y);
-      ctx.stroke();
+      ctx.strokeStyle = dinoIsNight ? 'rgba(0,212,255,0.4)' : 'rgba(255,255,255,0.35)';
+      ctx.lineWidth   = 2;
+      ctx.beginPath(); ctx.moveTo(0, GROUND_Y); ctx.lineTo(width, GROUND_Y); ctx.stroke();
 
-      ctx.fillStyle = dinoIsNight ? 'rgba(0, 212, 255, 0.5)' : 'rgba(255, 255, 255, 0.4)';
+      ctx.fillStyle = dinoIsNight ? 'rgba(0,212,255,0.5)' : 'rgba(255,255,255,0.4)';
       for (const b of dinoGroundBumps) {
         const renderX = (b.x - dinoGroundOffset) % (width + 100);
-        if (renderX >= -20 && renderX <= width) {
-          ctx.fillRect(renderX, GROUND_Y + b.yOffset, b.length, 2);
-        }
+        if (renderX >= -20 && renderX <= width) ctx.fillRect(renderX, GROUND_Y + b.yOffset, b.length, 2);
       }
 
       // Physics
       if (!dino.isGrounded) {
         dino.vy += dino.gravity;
-        dino.y += dino.vy;
-        if (dino.y >= dino.baseY) {
-          dino.y = dino.baseY;
-          dino.vy = 0;
-          dino.isGrounded = true;
-        }
+        dino.y  += dino.vy;
+        if (dino.y >= dino.baseY) { dino.y = dino.baseY; dino.vy = 0; dino.isGrounded = true; }
       }
 
       dino.stepTimer += dinoSpeed;
-      if (dino.stepTimer > 8) {
-        dino.legState = dino.legState === 0 ? 1 : 0;
-        dino.stepTimer = 0;
-      }
+      if (dino.stepTimer > 8) { dino.legState = dino.legState === 0 ? 1 : 0; dino.stepTimer = 0; }
 
       drawDinoSprite();
 
       // Obstacles
       if (dinoObstacles.length === 0 || (width - dinoObstacles[dinoObstacles.length - 1].x) > (200 + Math.random() * 180)) {
-        if (Math.random() < 0.035) {
-          spawnDinoObstacle();
-        }
+        if (Math.random() < 0.035) spawnDinoObstacle();
       }
 
       for (let i = dinoObstacles.length - 1; i >= 0; i--) {
         const obs = dinoObstacles[i];
         obs.x -= dinoSpeed;
-
         if (obs.type === 'bird') {
           obs.frameTimer++;
-          if (obs.frameTimer > 10) {
-            obs.frame = obs.frame === 0 ? 1 : 0;
-            obs.frameTimer = 0;
-          }
+          if (obs.frameTimer > 10) { obs.frame = obs.frame === 0 ? 1 : 0; obs.frameTimer = 0; }
         }
-
         drawDinoObstacle(obs);
-
         if (checkDinoCollision(dino, obs)) {
           dino.isDead = true;
           drawDinoSprite();
-          handleGameOver(dinoScore, dinoHighScore, 'chromeDinoHighScore');
+          handleGameOver('dino', dinoScore);
           return;
         }
-
-        if (obs.x + obs.width < -30) {
-          dinoObstacles.splice(i, 1);
-        }
+        if (obs.x + obs.width < -30) dinoObstacles.splice(i, 1);
       }
     }
 
     /* ==========================================
        GAME 2: SPACE ARCADE BLASTER
        ========================================== */
-    let spaceScore = 0;
-    let spaceHighScore = parseInt(localStorage.getItem('spaceBlasterHighScore') || '0', 10);
-    let spaceLives = 3;
-    let spaceLasers = [];
-    let spaceEnemies = [];
-    let spaceParticles = [];
-    let spaceStars = [];
-    let spaceLastShot = 0;
+    let spaceScore       = 0;
+    let spaceLives       = 3;
+    let spaceLasers      = [];
+    let spaceEnemies     = [];
+    let spaceParticles   = [];
+    let spaceStars       = [];
+    let spaceLastShot    = 0;
     let spaceInvulnerableTimer = 0;
+    let spaceAutoFireInterval  = null;
 
-    const player = {
-      x: 320,
-      y: 290,
-      width: 28,
-      height: 28,
-      speed: 7.5
-    };
-
-    const spaceKeys = {
-      left: false,
-      right: false,
-      fire: false
-    };
+    const player = { x: 320, y: 290, width: 28, height: 28, speed: 7.5 };
+    const spaceKeys = { left: false, right: false, fire: false };
 
     function initSpace() {
-      spaceScore = 0;
-      spaceLives = 3;
-      spaceLasers = [];
-      spaceEnemies = [];
+      spaceScore     = 0;
+      spaceLives     = 3;
+      spaceLasers    = [];
+      spaceEnemies   = [];
       spaceParticles = [];
       spaceInvulnerableTimer = 0;
       player.x = width / 2;
@@ -536,28 +667,19 @@
         });
       }
 
-      for (let i = 0; i < 3; i++) {
-        spawnSpaceEnemy(Math.random() * -100 - 20);
-      }
-
+      for (let i = 0; i < 3; i++) spawnSpaceEnemy(Math.random() * -100 - 20);
       updateSpaceLivesHUD();
     }
 
     function updateSpaceLivesHUD() {
-      if (livesEl) {
-        livesEl.textContent = '❤️'.repeat(Math.max(0, spaceLives));
-      }
+      if (livesEl) livesEl.textContent = '❤️'.repeat(Math.max(0, spaceLives));
     }
 
     function fireSpaceLaser() {
-      if (isGameOver || !isRunning) {
-        resetActiveGame();
-        return;
-      }
+      if (isGameOver || !isRunning) { resetActiveGame(); return; }
       const now = Date.now();
       if (now - spaceLastShot < 140) return;
       spaceLastShot = now;
-
       spaceLasers.push({ x: player.x - 7, y: player.y - 14, vx: 0, vy: -10 });
       spaceLasers.push({ x: player.x + 7, y: player.y - 14, vx: 0, vy: -10 });
       playSound('laser');
@@ -565,15 +687,12 @@
 
     function spawnSpaceEnemy(customY) {
       const types = ['invader', 'asteroid', 'cruiser'];
-      const type = types[Math.floor(Math.random() * types.length)];
-      const size = type === 'asteroid' ? 24 : 20;
-
+      const type  = types[Math.floor(Math.random() * types.length)];
+      const size  = type === 'asteroid' ? 24 : 20;
       spaceEnemies.push({
-        type,
-        x: Math.random() * (width - 60) + 30,
+        type, x: Math.random() * (width - 60) + 30,
         y: customY !== undefined ? customY : -25,
-        size,
-        speed: Math.random() * 1.5 + 2.0,
+        size, speed: Math.random() * 1.5 + 2.0,
         hp: type === 'cruiser' ? 2 : 1,
         color: type === 'invader' ? '#ff2d78' : type === 'asteroid' ? '#8b949e' : '#ffbd2e'
       });
@@ -585,11 +704,8 @@
         const speed = Math.random() * 4.5 + 1.2;
         spaceParticles.push({
           x, y,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed,
-          size: Math.random() * 3 + 1,
-          color: color || '#ff2d78',
-          life: 1
+          vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+          size: Math.random() * 3 + 1, color: color || '#ff2d78', life: 1
         });
       }
     }
@@ -600,7 +716,7 @@
 
       if (scoreEl) scoreEl.textContent = String(spaceScore).padStart(5, '0');
 
-      // Background Stars
+      // Stars
       for (const s of spaceStars) {
         s.y += s.speed;
         if (s.y > height) s.y = 0;
@@ -608,17 +724,16 @@
         ctx.fillRect(s.x, s.y, s.size, s.size);
       }
 
-      // Player Movement
-      if (spaceKeys.left) player.x -= player.speed;
+      // Movement
+      if (spaceKeys.left)  player.x -= player.speed;
       if (spaceKeys.right) player.x += player.speed;
-      if (spaceKeys.fire) fireSpaceLaser();
-
+      if (spaceKeys.fire)  fireSpaceLaser();
       player.x = Math.max(player.width / 2, Math.min(width - player.width / 2, player.x));
       player.y = height - 40;
 
       if (spaceInvulnerableTimer > 0) spaceInvulnerableTimer--;
 
-      // Render Player Ship
+      // Player
       if (spaceInvulnerableTimer % 4 < 2) {
         ctx.fillStyle = '#00d4ff';
         ctx.beginPath();
@@ -626,12 +741,10 @@
         ctx.lineTo(player.x - 14, player.y + 12);
         ctx.lineTo(player.x, player.y + 6);
         ctx.lineTo(player.x + 14, player.y + 12);
-        ctx.closePath();
-        ctx.fill();
+        ctx.closePath(); ctx.fill();
 
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(player.x - 2, player.y - 4, 4, 6);
-
         ctx.fillStyle = Math.random() > 0.5 ? '#ff2d78' : '#ffbd2e';
         ctx.fillRect(player.x - 3, player.y + 8, 6, Math.random() * 8 + 4);
       }
@@ -645,10 +758,9 @@
         if (l.y < -15) spaceLasers.splice(i, 1);
       }
 
-      // Spawn Enemies
       if (Math.random() < 0.038) spawnSpaceEnemy();
 
-      // Update Enemies
+      // Enemies
       for (let i = spaceEnemies.length - 1; i >= 0; i--) {
         const e = spaceEnemies[i];
         e.y += e.speed;
@@ -660,38 +772,28 @@
           ctx.fillRect(e.x - 6, e.y + 6, 4, 4);
           ctx.fillRect(e.x + 2, e.y + 6, 4, 4);
         } else if (e.type === 'asteroid') {
-          ctx.beginPath();
-          ctx.arc(e.x, e.y, e.size / 2, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.beginPath(); ctx.arc(e.x, e.y, e.size / 2, 0, Math.PI * 2); ctx.fill();
         } else {
           ctx.beginPath();
           ctx.moveTo(e.x, e.y + 12);
           ctx.lineTo(e.x - 12, e.y - 10);
           ctx.lineTo(e.x + 12, e.y - 10);
-          ctx.closePath();
-          ctx.fill();
+          ctx.closePath(); ctx.fill();
         }
 
-        // Check collision with player
         if (spaceInvulnerableTimer <= 0) {
-          const distToPlayer = Math.hypot(player.x - e.x, player.y - e.y);
-          if (distToPlayer < 22) {
+          if (Math.hypot(player.x - e.x, player.y - e.y) < 22) {
             createExplosion(e.x, e.y, '#ff2d78');
             spaceEnemies.splice(i, 1);
             spaceLives--;
             spaceInvulnerableTimer = 45;
             updateSpaceLivesHUD();
             playSound('hit');
-
-            if (spaceLives <= 0) {
-              handleGameOver(spaceScore, spaceHighScore, 'spaceBlasterHighScore');
-              return;
-            }
+            if (spaceLives <= 0) { handleGameOver('space', spaceScore); return; }
             continue;
           }
         }
 
-        // Check collision with lasers
         for (let j = spaceLasers.length - 1; j >= 0; j--) {
           const l = spaceLasers[j];
           if (Math.hypot(l.x - e.x, l.y - e.y) < e.size) {
@@ -701,23 +803,19 @@
             if (e.hp <= 0) {
               spaceScore += 20;
               spaceEnemies.splice(i, 1);
+              if (spaceScore % 100 === 0) flashScore();
               playSound('hit');
             }
             break;
           }
         }
-
-        if (e.y > height + 30) {
-          spaceEnemies.splice(i, 1);
-        }
+        if (e.y > height + 30) spaceEnemies.splice(i, 1);
       }
 
       // Particles
       for (let i = spaceParticles.length - 1; i >= 0; i--) {
         const p = spaceParticles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.life -= 0.04;
+        p.x += p.vx; p.y += p.vy; p.life -= 0.04;
         ctx.fillStyle = p.color;
         ctx.globalAlpha = Math.max(0, p.life);
         ctx.fillRect(p.x, p.y, p.size, p.size);
@@ -727,50 +825,46 @@
     }
 
     /* ==========================================
-       GAME 3: RETRO CYBER SNAKE 🐍
+       GAME 3: RETRO CYBER SNAKE
        ========================================== */
     const GRID_SIZE = 16;
-    let snakeScore = 0;
-    let snakeHighScore = parseInt(localStorage.getItem('cyberSnakeHighScore') || '0', 10);
-    let snakeBody = [];
-    let snakeDir = { x: 1, y: 0 };
-    let snakeNextDir = { x: 1, y: 0 };
-    let snakeFood = { x: 8, y: 8, type: 'normal' };
+    let snakeScore     = 0;
+    let snakeBody      = [];
+    let snakeDir       = { x: 1, y: 0 };
+    let snakeNextDir   = { x: 1, y: 0 };
+    let snakeFood      = { x: 8, y: 8, type: 'normal' };
     let snakeSpecialFood = null;
-    let snakeLastMove = 0;
-    let snakeSpeed = 100;
+    let snakeLastMove  = 0;
+    let snakeSpeed     = 100;
     let snakeParticles = [];
 
     function initSnake() {
-      snakeScore = 0;
-      snakeDir = { x: 1, y: 0 };
-      snakeNextDir = { x: 1, y: 0 };
-      snakeSpeed = 100;
-      snakeLastMove = performance.now();
-      snakeParticles = [];
+      snakeScore       = 0;
+      snakeDir         = { x: 1, y: 0 };
+      snakeNextDir     = { x: 1, y: 0 };
+      snakeSpeed       = 100;
+      snakeLastMove    = performance.now();
+      snakeParticles   = [];
+      snakeSpecialFood = null;
 
       const startX = Math.floor((width / GRID_SIZE) / 2);
       const startY = Math.floor((height / GRID_SIZE) / 2);
       snakeBody = [
-        { x: startX, y: startY },
+        { x: startX,     y: startY },
         { x: startX - 1, y: startY },
         { x: startX - 2, y: startY }
       ];
-
       spawnSnakeFood();
-      snakeSpecialFood = null;
     }
 
     function spawnSnakeFood() {
       const cols = Math.floor(width / GRID_SIZE);
       const rows = Math.floor(height / GRID_SIZE);
-      let valid = false;
-      let newX = 0, newY = 0;
-      let attempts = 0;
+      let valid = false, newX = 0, newY = 0, attempts = 0;
       while (!valid && attempts < 100) {
         attempts++;
-        newX = Math.floor(Math.random() * (cols - 2)) + 1;
-        newY = Math.floor(Math.random() * (rows - 2)) + 1;
+        newX  = Math.floor(Math.random() * (cols - 2)) + 1;
+        newY  = Math.floor(Math.random() * (rows - 2)) + 1;
         valid = !snakeBody.some(seg => seg.x === newX && seg.y === newY);
       }
       snakeFood = { x: newX, y: newY, type: 'normal' };
@@ -779,14 +873,13 @@
     function spawnSnakeSpecialFood() {
       const cols = Math.floor(width / GRID_SIZE);
       const rows = Math.floor(height / GRID_SIZE);
-      let valid = false;
-      let newX = 0, newY = 0;
-      let attempts = 0;
+      let valid = false, newX = 0, newY = 0, attempts = 0;
       while (!valid && attempts < 100) {
         attempts++;
-        newX = Math.floor(Math.random() * (cols - 2)) + 1;
-        newY = Math.floor(Math.random() * (rows - 2)) + 1;
-        valid = !snakeBody.some(seg => seg.x === newX && seg.y === newY) && !(snakeFood.x === newX && snakeFood.y === newY);
+        newX  = Math.floor(Math.random() * (cols - 2)) + 1;
+        newY  = Math.floor(Math.random() * (rows - 2)) + 1;
+        valid = !snakeBody.some(seg => seg.x === newX && seg.y === newY) &&
+                !(snakeFood.x === newX && snakeFood.y === newY);
       }
       snakeSpecialFood = { x: newX, y: newY, life: 180 };
     }
@@ -798,20 +891,14 @@
         snakeParticles.push({
           x: x * GRID_SIZE + GRID_SIZE / 2,
           y: y * GRID_SIZE + GRID_SIZE / 2,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed,
-          size: Math.random() * 3 + 1.5,
-          color: color || '#00ff41',
-          life: 1
+          vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+          size: Math.random() * 3 + 1.5, color: color || '#00ff41', life: 1
         });
       }
     }
 
     function changeSnakeDirection(dx, dy) {
-      if (isGameOver || !isRunning) {
-        resetActiveGame();
-        return;
-      }
+      if (isGameOver || !isRunning) { resetActiveGame(); return; }
       if (snakeDir.x !== 0 && dx === -snakeDir.x) return;
       if (snakeDir.y !== 0 && dy === -snakeDir.y) return;
       snakeNextDir = { x: dx, y: dy };
@@ -824,20 +911,13 @@
       const cols = Math.floor(width / GRID_SIZE);
       const rows = Math.floor(height / GRID_SIZE);
 
-      // Subtle Cyber Grid lines
-      ctx.strokeStyle = 'rgba(0, 255, 65, 0.05)';
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(0,255,65,0.05)';
+      ctx.lineWidth   = 1;
       for (let x = 0; x < width; x += GRID_SIZE) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
       }
       for (let y = 0; y < height; y += GRID_SIZE) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
       }
 
       if (scoreEl) scoreEl.textContent = String(snakeScore).padStart(5, '0');
@@ -846,37 +926,28 @@
       if (now - snakeLastMove > snakeSpeed) {
         snakeLastMove = now;
         snakeDir = { ...snakeNextDir };
-
         const head = { x: snakeBody[0].x + snakeDir.x, y: snakeBody[0].y + snakeDir.y };
 
-        // Wall Collision
         if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows) {
-          handleGameOver(snakeScore, snakeHighScore, 'cyberSnakeHighScore');
-          return;
+          handleGameOver('snake', snakeScore); return;
         }
-
-        // Self Collision
         if (snakeBody.some(seg => seg.x === head.x && seg.y === head.y)) {
-          handleGameOver(snakeScore, snakeHighScore, 'cyberSnakeHighScore');
-          return;
+          handleGameOver('snake', snakeScore); return;
         }
-
         snakeBody.unshift(head);
 
-        // Check Food
         if (head.x === snakeFood.x && head.y === snakeFood.y) {
           snakeScore += 10;
           playSound('eat');
+          flashScore();
           createSnakeBurst(head.x, head.y, '#00ff41');
           spawnSnakeFood();
           snakeSpeed = Math.max(55, 100 - Math.floor(snakeScore / 30) * 4);
-
-          if (Math.random() < 0.35 && !snakeSpecialFood) {
-            spawnSnakeSpecialFood();
-          }
+          if (Math.random() < 0.35 && !snakeSpecialFood) spawnSnakeSpecialFood();
         } else if (snakeSpecialFood && head.x === snakeSpecialFood.x && head.y === snakeSpecialFood.y) {
           snakeScore += 50;
           playSound('powerup');
+          flashScore();
           createSnakeBurst(head.x, head.y, '#ff2d78');
           snakeSpecialFood = null;
         } else {
@@ -884,62 +955,44 @@
         }
       }
 
-      // Special Food
+      // Special food
       if (snakeSpecialFood) {
         snakeSpecialFood.life--;
         if (snakeSpecialFood.life <= 0) {
           snakeSpecialFood = null;
         } else {
-          const pX = snakeSpecialFood.x * GRID_SIZE + GRID_SIZE / 2;
-          const pY = snakeSpecialFood.y * GRID_SIZE + GRID_SIZE / 2;
+          const pX    = snakeSpecialFood.x * GRID_SIZE + GRID_SIZE / 2;
+          const pY    = snakeSpecialFood.y * GRID_SIZE + GRID_SIZE / 2;
           const pulse = Math.sin(Date.now() / 120) * 3 + GRID_SIZE / 2 - 2;
           ctx.fillStyle = '#ff2d78';
-          ctx.beginPath();
-          ctx.arc(pX, pY, Math.max(3, pulse), 0, Math.PI * 2);
-          ctx.fill();
+          ctx.beginPath(); ctx.arc(pX, pY, Math.max(3, pulse), 0, Math.PI * 2); ctx.fill();
           ctx.fillStyle = '#ffffff';
           ctx.fillRect(pX - 2, pY - 2, 4, 4);
         }
       }
 
-      // Normal Food
-      const fX = snakeFood.x * GRID_SIZE;
-      const fY = snakeFood.y * GRID_SIZE;
+      // Normal food
+      const fX = snakeFood.x * GRID_SIZE, fY = snakeFood.y * GRID_SIZE;
       ctx.fillStyle = '#00ff41';
       ctx.fillRect(fX + 2, fY + 2, GRID_SIZE - 4, GRID_SIZE - 4);
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(fX + 5, fY + 5, GRID_SIZE - 10, GRID_SIZE - 10);
 
-      // Draw Snake Body
+      // Snake body
       for (let i = 0; i < snakeBody.length; i++) {
         const seg = snakeBody[i];
-        const sX = seg.x * GRID_SIZE;
-        const sY = seg.y * GRID_SIZE;
-
+        const sX = seg.x * GRID_SIZE, sY = seg.y * GRID_SIZE;
         if (i === 0) {
           ctx.fillStyle = '#00d4ff';
           ctx.fillRect(sX + 1, sY + 1, GRID_SIZE - 2, GRID_SIZE - 2);
-
           ctx.fillStyle = '#ffffff';
-          if (snakeDir.x === 1) {
-            ctx.fillRect(sX + GRID_SIZE - 5, sY + 3, 3, 3);
-            ctx.fillRect(sX + GRID_SIZE - 5, sY + GRID_SIZE - 6, 3, 3);
-          } else if (snakeDir.x === -1) {
-            ctx.fillRect(sX + 2, sY + 3, 3, 3);
-            ctx.fillRect(sX + 2, sY + GRID_SIZE - 6, 3, 3);
-          } else if (snakeDir.y === 1) {
-            ctx.fillRect(sX + 3, sY + GRID_SIZE - 5, 3, 3);
-            ctx.fillRect(sX + GRID_SIZE - 6, sY + GRID_SIZE - 5, 3, 3);
-          } else {
-            ctx.fillRect(sX + 3, sY + 2, 3, 3);
-            ctx.fillRect(sX + GRID_SIZE - 6, sY + 2, 3, 3);
-          }
+          if      (snakeDir.x === 1)  { ctx.fillRect(sX + GRID_SIZE - 5, sY + 3, 3, 3); ctx.fillRect(sX + GRID_SIZE - 5, sY + GRID_SIZE - 6, 3, 3); }
+          else if (snakeDir.x === -1) { ctx.fillRect(sX + 2, sY + 3, 3, 3); ctx.fillRect(sX + 2, sY + GRID_SIZE - 6, 3, 3); }
+          else if (snakeDir.y === 1)  { ctx.fillRect(sX + 3, sY + GRID_SIZE - 5, 3, 3); ctx.fillRect(sX + GRID_SIZE - 6, sY + GRID_SIZE - 5, 3, 3); }
+          else                        { ctx.fillRect(sX + 3, sY + 2, 3, 3); ctx.fillRect(sX + GRID_SIZE - 6, sY + 2, 3, 3); }
         } else {
           const ratio = i / snakeBody.length;
-          const r = Math.floor(0 + ratio * 120);
-          const g = Math.floor(212 - ratio * 100);
-          const b = Math.floor(255 - ratio * 40);
-          ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+          ctx.fillStyle = `rgb(${Math.floor(ratio * 120)},${Math.floor(212 - ratio * 100)},${Math.floor(255 - ratio * 40)})`;
           ctx.fillRect(sX + 2, sY + 2, GRID_SIZE - 4, GRID_SIZE - 4);
         }
       }
@@ -947,9 +1000,7 @@
       // Particles
       for (let i = snakeParticles.length - 1; i >= 0; i--) {
         const p = snakeParticles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.life -= 0.05;
+        p.x += p.vx; p.y += p.vy; p.life -= 0.05;
         ctx.fillStyle = p.color;
         ctx.globalAlpha = Math.max(0, p.life);
         ctx.fillRect(p.x, p.y, p.size, p.size);
@@ -958,25 +1009,17 @@
       }
     }
 
-    // GAME OVER HANDLER
-    function handleGameOver(finalScore, currentHigh, storageKey) {
-      isRunning = false;
+    /* ==========================================
+       GAME OVER HANDLER
+       ========================================== */
+    function handleGameOver(gameKey, finalScore) {
+      isRunning  = false;
       isGameOver = true;
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-        animationFrameId = null;
-      }
+      if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; }
       playSound('hit');
 
-      if (finalScore > currentHigh) {
-        localStorage.setItem(storageKey, finalScore);
-        if (storageKey === 'chromeDinoHighScore') dinoHighScore = finalScore;
-        if (storageKey === 'spaceBlasterHighScore') spaceHighScore = finalScore;
-        if (storageKey === 'cyberSnakeHighScore') snakeHighScore = finalScore;
-      }
-
-      const effectiveHigh = Math.max(finalScore, currentHigh);
-      if (highScoreEl) highScoreEl.textContent = String(effectiveHigh).padStart(5, '0');
+      const topScore = getTopScore(gameKey);
+      const effectiveHigh = Math.max(finalScore, topScore);
 
       if (overlayScreen) {
         overlayScreen.style.display = 'flex';
@@ -984,46 +1027,48 @@
           overlaySubtitle.textContent = `Score: ${finalScore}  |  HI: ${effectiveHigh}`;
         }
       }
+
+      // Hide leaderboard panel if open
+      hideFullLeaderboard();
+
+      // Show leaderboard + name entry if needed
+      showGameoverLeaderboard(gameKey, finalScore);
     }
 
-    // MAIN RUNNING LOOP
+    /* ==========================================
+       GAME LOOP
+       ========================================== */
     function gameLoop() {
-      if (currentGame === 'dino') {
-        updateAndRenderDino();
-      } else if (currentGame === 'space') {
-        updateAndRenderSpace();
-      } else {
-        updateAndRenderSnake();
-      }
+      if (currentGame === 'dino')       updateAndRenderDino();
+      else if (currentGame === 'space') updateAndRenderSpace();
+      else                              updateAndRenderSnake();
 
-      if (isRunning && !isGameOver) {
-        animationFrameId = requestAnimationFrame(gameLoop);
-      }
+      if (isRunning && !isGameOver) animationFrameId = requestAnimationFrame(gameLoop);
     }
 
     function startGameLoop() {
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-        animationFrameId = null;
-      }
-      isRunning = true;
+      if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; }
+      isRunning  = true;
       isGameOver = false;
       animationFrameId = requestAnimationFrame(gameLoop);
     }
 
     function resetActiveGame() {
       isGameOver = false;
+      pendingScore   = 0;
+      pendingGameKey = '';
       if (overlayScreen) overlayScreen.style.display = 'none';
+      hideFullLeaderboard();
 
       if (currentGame === 'dino') {
         initDino();
-        if (highScoreEl) highScoreEl.textContent = String(dinoHighScore).padStart(5, '0');
+        updateHUD('dino');
       } else if (currentGame === 'space') {
         initSpace();
-        if (highScoreEl) highScoreEl.textContent = String(spaceHighScore).padStart(5, '0');
+        updateHUD('space');
       } else {
         initSnake();
-        if (highScoreEl) highScoreEl.textContent = String(snakeHighScore).padStart(5, '0');
+        updateHUD('snake');
       }
       startGameLoop();
     }
@@ -1032,23 +1077,19 @@
       currentGame = gameType;
 
       if (tabDino && tabSpace && tabSnake) {
-        tabDino.classList.toggle('active', gameType === 'dino');
+        tabDino.classList.toggle('active',  gameType === 'dino');
         tabSpace.classList.toggle('active', gameType === 'space');
         tabSnake.classList.toggle('active', gameType === 'snake');
 
-        if (livesWrapper) livesWrapper.style.display = gameType === 'space' ? 'flex' : 'none';
-        if (dinoControls) dinoControls.style.display = gameType === 'dino' ? 'flex' : 'none';
+        if (livesWrapper)  livesWrapper.style.display  = gameType === 'space' ? 'flex' : 'none';
+        if (dinoControls)  dinoControls.style.display  = gameType === 'dino'  ? 'flex' : 'none';
         if (spaceControls) spaceControls.style.display = gameType === 'space' ? 'flex' : 'none';
         if (snakeControls) snakeControls.style.display = gameType === 'snake' ? 'flex' : 'none';
 
         if (instructionsEl) {
-          if (gameType === 'dino') {
-            instructionsEl.innerHTML = '<span>⌨️ <strong>Space</strong> / <strong>↑</strong> to Jump | <strong>↓</strong> to Duck | Tap Screen</span>';
-          } else if (gameType === 'space') {
-            instructionsEl.innerHTML = '<span>⌨️ <strong>← →</strong> / <strong>A D</strong> or Mouse Drag | <strong>Space</strong> / Click to Fire</span>';
-          } else {
-            instructionsEl.innerHTML = '<span>⌨️ <strong>Arrow Keys</strong> / <strong>W A S D</strong> or Swipe to Turn</span>';
-          }
+          if      (gameType === 'dino')  instructionsEl.innerHTML = '<span>⌨️ <strong>Space</strong> / <strong>↑</strong> Jump | <strong>↓</strong> Duck</span>';
+          else if (gameType === 'space') instructionsEl.innerHTML = '<span>⌨️ <strong>← →</strong> Move | <strong>Space</strong> Fire | Mouse/Touch Drag</span>';
+          else                           instructionsEl.innerHTML = '<span>⌨️ <strong>Arrow Keys</strong> / <strong>WASD</strong> or Swipe</span>';
         }
       }
 
@@ -1056,129 +1097,96 @@
       resetActiveGame();
     }
 
-    if (tabDino) tabDino.addEventListener('click', () => switchGame('dino'));
+    if (tabDino)  tabDino.addEventListener('click',  () => switchGame('dino'));
     if (tabSpace) tabSpace.addEventListener('click', () => switchGame('space'));
     if (tabSnake) tabSnake.addEventListener('click', () => switchGame('snake'));
 
-    // Open & Close Modal
+    /* ==========================================
+       MODAL OPEN / CLOSE
+       ========================================== */
     openGameModalFn = function (initialGame = 'dino') {
       if (!gameModal) return;
       gameModal.classList.add('active');
       gameModal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
-      setTimeout(() => {
-        switchGame(initialGame);
-      }, 40);
+      setTimeout(() => switchGame(initialGame), 40);
     };
 
     function closeGameModal() {
       if (!gameModal) return;
-      isRunning = false;
+      isRunning  = false;
       isGameOver = true;
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-        animationFrameId = null;
-      }
+      if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; }
+      if (spaceAutoFireInterval) { clearInterval(spaceAutoFireInterval); spaceAutoFireInterval = null; }
       gameModal.classList.remove('active');
       gameModal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
+      pendingScore   = 0;
+      pendingGameKey = '';
     }
 
     window.closeGameModal = closeGameModal;
 
-    openGameTriggers.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        openGameModalFn();
-      });
-    });
-
-    closeGameBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        closeGameModal();
-      });
-    });
-
+    openGameTriggers.forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); openGameModalFn(); }));
+    closeGameBtns.forEach(btn => btn.addEventListener('click',    (e) => { e.preventDefault(); closeGameModal(); }));
     if (gameModalBackdrop) gameModalBackdrop.addEventListener('click', closeGameModal);
+    if (restartBtn) restartBtn.addEventListener('click', () => resetActiveGame());
 
-    if (restartBtn) {
-      restartBtn.addEventListener('click', () => {
-        resetActiveGame();
-      });
-    }
-
-    // Keyboard Event Handlers
+    /* ==========================================
+       KEYBOARD EVENTS
+       ========================================== */
     window.addEventListener('keydown', (e) => {
-      if (gameModal && gameModal.classList.contains('active')) {
-        if (currentGame === 'dino') {
-          if (e.code === 'Space' || e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
-            e.preventDefault();
-            dinoJump();
-          } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
-            e.preventDefault();
-            dinoDuck(true);
-          }
-        } else if (currentGame === 'space') {
-          if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
-            e.preventDefault();
-            spaceKeys.left = true;
-          }
-          if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
-            e.preventDefault();
-            spaceKeys.right = true;
-          }
-          if (e.code === 'Space' || e.key === ' ') {
-            e.preventDefault();
-            fireSpaceLaser();
-          }
-        } else if (currentGame === 'snake') {
-          if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
-            e.preventDefault();
-            changeSnakeDirection(0, -1);
-          } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
-            e.preventDefault();
-            changeSnakeDirection(0, 1);
-          } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
-            e.preventDefault();
-            changeSnakeDirection(-1, 0);
-          } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
-            e.preventDefault();
-            changeSnakeDirection(1, 0);
-          }
-        }
+      if (!gameModal || !gameModal.classList.contains('active')) return;
 
-        if (e.key === 'Escape') closeGameModal();
+      // Don't intercept keys when name input is focused
+      if (document.activeElement === scoreNameInput) return;
+
+      if (currentGame === 'dino') {
+        if (['Space', 'ArrowUp'].includes(e.code) || ['w', 'W', ' ', 'ArrowUp'].includes(e.key)) {
+          e.preventDefault(); dinoJump();
+        } else if (['ArrowDown', 's', 'S'].includes(e.key)) {
+          e.preventDefault(); dinoDuck(true);
+        }
+      } else if (currentGame === 'space') {
+        if (['ArrowLeft', 'a', 'A'].includes(e.key)) { e.preventDefault(); spaceKeys.left = true; }
+        if (['ArrowRight', 'd', 'D'].includes(e.key)) { e.preventDefault(); spaceKeys.right = true; }
+        if (e.code === 'Space' || e.key === ' ') { e.preventDefault(); fireSpaceLaser(); }
+      } else if (currentGame === 'snake') {
+        if      (['ArrowUp', 'w', 'W'].includes(e.key))    { e.preventDefault(); changeSnakeDirection(0, -1); }
+        else if (['ArrowDown', 's', 'S'].includes(e.key))  { e.preventDefault(); changeSnakeDirection(0, 1); }
+        else if (['ArrowLeft', 'a', 'A'].includes(e.key))  { e.preventDefault(); changeSnakeDirection(-1, 0); }
+        else if (['ArrowRight', 'd', 'D'].includes(e.key)) { e.preventDefault(); changeSnakeDirection(1, 0); }
       }
+
+      if (e.key === 'Escape') closeGameModal();
     });
 
     window.addEventListener('keyup', (e) => {
       if (currentGame === 'dino') {
-        if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
-          dinoDuck(false);
-        }
+        if (['ArrowDown', 's', 'S'].includes(e.key)) dinoDuck(false);
       } else if (currentGame === 'space') {
-        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') spaceKeys.left = false;
-        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') spaceKeys.right = false;
+        if (['ArrowLeft', 'a', 'A'].includes(e.key))   spaceKeys.left  = false;
+        if (['ArrowRight', 'd', 'D'].includes(e.key))  spaceKeys.right = false;
       }
     });
 
-    // Touch Swipe Detection for Snake
-    let touchStartX = 0, touchStartY = 0;
+    /* ==========================================
+       TOUCH / MOUSE EVENTS ON CANVAS
+       ========================================== */
+    let touchStartX = 0, touchStartY = 0, touchMoved = false;
+    const SWIPE_THRESHOLD = 25;
 
     canvas.addEventListener('mousedown', (e) => {
       e.preventDefault();
-      if (currentGame === 'dino') {
-        dinoJump();
-      } else if (currentGame === 'space') {
-        fireSpaceLaser();
-      }
+      if (currentGame === 'dino')       dinoJump();
+      else if (currentGame === 'space') fireSpaceLaser();
     });
 
     canvas.addEventListener('mousemove', (e) => {
       if (currentGame === 'space' && isRunning && !isGameOver) {
         const rect = canvas.getBoundingClientRect();
-        player.x = Math.max(player.width / 2, Math.min(width - player.width / 2, e.clientX - rect.left));
+        const scaleX = width / rect.width;
+        player.x = Math.max(player.width / 2, Math.min(width - player.width / 2, (e.clientX - rect.left) * scaleX));
       }
     });
 
@@ -1186,6 +1194,7 @@
       if (e.touches && e.touches[0]) {
         touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
+        touchMoved  = false;
       }
       if (currentGame === 'dino') {
         e.preventDefault();
@@ -1193,18 +1202,21 @@
       } else if (currentGame === 'space') {
         e.preventDefault();
         const rect = canvas.getBoundingClientRect();
+        const scaleX = width / rect.width;
         if (e.touches && e.touches[0]) {
-          player.x = Math.max(player.width / 2, Math.min(width - player.width / 2, e.touches[0].clientX - rect.left));
+          player.x = Math.max(player.width / 2, Math.min(width - player.width / 2, (e.touches[0].clientX - rect.left) * scaleX));
         }
         fireSpaceLaser();
       }
     }, { passive: false });
 
     canvas.addEventListener('touchmove', (e) => {
+      touchMoved = true;
       if (currentGame === 'space' && isRunning && !isGameOver) {
-        const rect = canvas.getBoundingClientRect();
+        const rect   = canvas.getBoundingClientRect();
+        const scaleX = width / rect.width;
         if (e.touches && e.touches[0]) {
-          player.x = Math.max(player.width / 2, Math.min(width - player.width / 2, e.touches[0].clientX - rect.left));
+          player.x = Math.max(player.width / 2, Math.min(width - player.width / 2, (e.touches[0].clientX - rect.left) * scaleX));
         }
       }
     }, { passive: true });
@@ -1213,66 +1225,69 @@
       if (currentGame === 'snake' && e.changedTouches && e.changedTouches[0]) {
         const deltaX = e.changedTouches[0].clientX - touchStartX;
         const deltaY = e.changedTouches[0].clientY - touchStartY;
-        if (Math.abs(deltaX) > 20 || Math.abs(deltaY) > 20) {
-          if (Math.abs(deltaX) > Math.abs(deltaY)) {
-            changeSnakeDirection(deltaX > 0 ? 1 : -1, 0);
-          } else {
-            changeSnakeDirection(0, deltaY > 0 ? 1 : -1);
-          }
+        if (Math.abs(deltaX) > SWIPE_THRESHOLD || Math.abs(deltaY) > SWIPE_THRESHOLD) {
+          if (Math.abs(deltaX) > Math.abs(deltaY)) changeSnakeDirection(deltaX > 0 ? 1 : -1, 0);
+          else                                      changeSnakeDirection(0, deltaY > 0 ? 1 : -1);
         }
       }
     }, { passive: true });
 
-    // Touch button binds
-    if (touchJumpBtn) {
-      touchJumpBtn.addEventListener('touchstart', (e) => { e.preventDefault(); dinoJump(); }, { passive: false });
-      touchJumpBtn.addEventListener('mousedown', () => dinoJump());
+    canvas.addEventListener('touchcancel', () => { touchMoved = false; }, { passive: true });
+
+    /* ==========================================
+       TOUCH BUTTON BINDS
+       ========================================== */
+    function bindTouchBtn(el, downFn, upFn) {
+      if (!el) return;
+      el.addEventListener('touchstart',  (e) => { e.preventDefault(); downFn && downFn(); }, { passive: false });
+      el.addEventListener('touchend',    (e) => { e.preventDefault(); upFn   && upFn();   }, { passive: false });
+      el.addEventListener('touchcancel', (e) => { e.preventDefault(); upFn   && upFn();   }, { passive: false });
+      el.addEventListener('mousedown', downFn || (() => {}));
+      el.addEventListener('mouseup',   upFn   || (() => {}));
+      el.addEventListener('mouseleave', upFn  || (() => {}));
     }
-    if (touchDuckBtn) {
-      touchDuckBtn.addEventListener('touchstart', (e) => { e.preventDefault(); dinoDuck(true); }, { passive: false });
-      touchDuckBtn.addEventListener('touchend', (e) => { e.preventDefault(); dinoDuck(false); }, { passive: false });
-      touchDuckBtn.addEventListener('mousedown', () => dinoDuck(true));
-      touchDuckBtn.addEventListener('mouseup', () => dinoDuck(false));
-    }
-    if (touchLeftBtn) {
-      touchLeftBtn.addEventListener('touchstart', (e) => { e.preventDefault(); spaceKeys.left = true; }, { passive: false });
-      touchLeftBtn.addEventListener('touchend', (e) => { e.preventDefault(); spaceKeys.left = false; }, { passive: false });
-      touchLeftBtn.addEventListener('mousedown', () => spaceKeys.left = true);
-      touchLeftBtn.addEventListener('mouseup', () => spaceKeys.left = false);
-    }
-    if (touchRightBtn) {
-      touchRightBtn.addEventListener('touchstart', (e) => { e.preventDefault(); spaceKeys.right = true; }, { passive: false });
-      touchRightBtn.addEventListener('touchend', (e) => { e.preventDefault(); spaceKeys.right = false; }, { passive: false });
-      touchRightBtn.addEventListener('mousedown', () => spaceKeys.right = true);
-      touchRightBtn.addEventListener('mouseup', () => spaceKeys.right = false);
-    }
+
+    bindTouchBtn(touchJumpBtn, () => dinoJump());
+    bindTouchBtn(touchDuckBtn, () => dinoDuck(true), () => dinoDuck(false));
+    bindTouchBtn(touchLeftBtn, () => spaceKeys.left  = true, () => spaceKeys.left  = false);
+    bindTouchBtn(touchRightBtn, () => spaceKeys.right = true, () => spaceKeys.right = false);
+
+    // Auto-fire while holding fire button
     if (touchFireBtn) {
-      touchFireBtn.addEventListener('touchstart', (e) => { e.preventDefault(); fireSpaceLaser(); }, { passive: false });
-      touchFireBtn.addEventListener('mousedown', () => fireSpaceLaser());
+      touchFireBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        fireSpaceLaser();
+        if (spaceAutoFireInterval) clearInterval(spaceAutoFireInterval);
+        spaceAutoFireInterval = setInterval(fireSpaceLaser, 150);
+      }, { passive: false });
+      touchFireBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        clearInterval(spaceAutoFireInterval); spaceAutoFireInterval = null;
+      }, { passive: false });
+      touchFireBtn.addEventListener('touchcancel', (e) => {
+        e.preventDefault();
+        clearInterval(spaceAutoFireInterval); spaceAutoFireInterval = null;
+      }, { passive: false });
+      touchFireBtn.addEventListener('mousedown', () => {
+        fireSpaceLaser();
+        if (spaceAutoFireInterval) clearInterval(spaceAutoFireInterval);
+        spaceAutoFireInterval = setInterval(fireSpaceLaser, 150);
+      });
+      touchFireBtn.addEventListener('mouseup',    () => { clearInterval(spaceAutoFireInterval); spaceAutoFireInterval = null; });
+      touchFireBtn.addEventListener('mouseleave', () => { clearInterval(spaceAutoFireInterval); spaceAutoFireInterval = null; });
     }
 
-    // Snake Touch D-Pad binds
-    if (touchSnakeUp) {
-      touchSnakeUp.addEventListener('touchstart', (e) => { e.preventDefault(); changeSnakeDirection(0, -1); }, { passive: false });
-      touchSnakeUp.addEventListener('mousedown', () => changeSnakeDirection(0, -1));
-    }
-    if (touchSnakeDown) {
-      touchSnakeDown.addEventListener('touchstart', (e) => { e.preventDefault(); changeSnakeDirection(0, 1); }, { passive: false });
-      touchSnakeDown.addEventListener('mousedown', () => changeSnakeDirection(0, 1));
-    }
-    if (touchSnakeLeft) {
-      touchSnakeLeft.addEventListener('touchstart', (e) => { e.preventDefault(); changeSnakeDirection(-1, 0); }, { passive: false });
-      touchSnakeLeft.addEventListener('mousedown', () => changeSnakeDirection(-1, 0));
-    }
-    if (touchSnakeRight) {
-      touchSnakeRight.addEventListener('touchstart', (e) => { e.preventDefault(); changeSnakeDirection(1, 0); }, { passive: false });
-      touchSnakeRight.addEventListener('mousedown', () => changeSnakeDirection(1, 0));
-    }
+    // Snake D-Pad
+    bindTouchBtn(touchSnakeUp,    () => changeSnakeDirection(0, -1));
+    bindTouchBtn(touchSnakeDown,  () => changeSnakeDirection(0, 1));
+    bindTouchBtn(touchSnakeLeft,  () => changeSnakeDirection(-1, 0));
+    bindTouchBtn(touchSnakeRight, () => changeSnakeDirection(1, 0));
 
+    /* ==========================================
+       RESIZE
+       ========================================== */
     window.addEventListener('resize', () => {
-      if (gameModal && gameModal.classList.contains('active')) {
-        resizeCanvas();
-      }
+      if (gameModal && gameModal.classList.contains('active')) resizeCanvas();
     });
   }
 

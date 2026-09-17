@@ -20,7 +20,7 @@
   <!-- Devicon — Technology Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.16.0/devicon.min.css" />
 
-  <link rel="stylesheet" href="css/style.css?v=35.0" />
+  <link rel="stylesheet" href="css/style.css?v=36.0" />
   <style>
     /* Hide native cursor everywhere — custom cursor handles all pointing */
     html, html *, html *::before, html *::after {
@@ -752,8 +752,13 @@
           </div>
           <div class="game-hud">
             <div class="hud-item" id="hudLivesWrapper" style="display: none;"><span id="gameLives" class="hud-lives">❤️❤️❤️</span></div>
-            <div class="hud-item"><span class="hud-label">HI:</span> <span id="gameHighScore" class="hud-val">00000</span></div>
+            <div class="hud-item hud-hi-item">
+              <span class="hud-label">HI:</span>
+              <span id="gameHighScore" class="hud-val">00000</span>
+              <span id="gameHighScoreHolder" class="hud-holder"></span>
+            </div>
             <div class="hud-item"><span class="hud-label">SCORE:</span> <span id="gameScore" class="hud-val">00000</span></div>
+            <button class="hud-lb-btn" id="hudLeaderboardBtn" title="Leaderboard">🏆</button>
             <button class="game-modal-close-btn" id="closeGameIconBtn" aria-label="Close Game">✕</button>
           </div>
         </div>
@@ -765,9 +770,34 @@
           <div class="game-overlay-screen" id="gameOverOverlay" style="display: none;">
             <h3 class="game-over-title" id="gameOverTitle">GAME OVER</h3>
             <p class="game-over-subtitle" id="gameOverSubtitle">Score: 0</p>
+
+            <!-- Name Entry (shown only on new high score) -->
+            <div class="score-name-entry" id="scoreNameEntry" style="display: none;">
+              <p class="name-entry-label">🏆 New High Score! Enter your name:</p>
+              <div class="name-entry-row">
+                <input type="text" id="scoreNameInput" class="score-name-input" maxlength="16" placeholder="Your name…" autocomplete="off" spellcheck="false" />
+                <button class="submit-score-btn" id="submitScoreBtn">Save</button>
+              </div>
+            </div>
+
+            <!-- Mini Leaderboard shown on game over -->
+            <div class="gameover-leaderboard" id="gameoverLeaderboard">
+              <div class="lb-title">🏅 Top Scores</div>
+              <ol class="lb-list" id="gameoverLbList"></ol>
+            </div>
+
             <button class="btn btn-primary btn-restart" id="gameRestartBtn">
               <span>Play Again (Space / Tap)</span>
             </button>
+          </div>
+
+          <!-- Full Leaderboard Panel (toggled by HUD button) -->
+          <div class="game-leaderboard-panel" id="gameLeaderboardPanel" style="display: none;">
+            <div class="lb-panel-header">
+              <span class="lb-panel-title">🏆 Leaderboard</span>
+              <button class="lb-panel-close" id="closeLbPanel">✕</button>
+            </div>
+            <ol class="lb-panel-list" id="lbPanelList"></ol>
           </div>
         </div>
 
@@ -786,11 +816,19 @@
             <button class="touch-btn fire" id="touchFireBtn">🔥 FIRE</button>
             <button class="touch-btn" id="touchRightBtn">▶ RIGHT</button>
           </div>
-          <div class="game-touch-controls" id="snakeTouchControls" style="display: none;">
-            <button class="touch-btn" id="touchSnakeUp">⬆</button>
-            <button class="touch-btn" id="touchSnakeLeft">◀</button>
-            <button class="touch-btn" id="touchSnakeRight">▶</button>
-            <button class="touch-btn" id="touchSnakeDown">⬇</button>
+          <!-- Snake D-Pad -->
+          <div class="game-touch-controls snake-dpad-wrap" id="snakeTouchControls" style="display: none;">
+            <div class="snake-dpad">
+              <div></div>
+              <button class="touch-btn dpad-btn" id="touchSnakeUp">▲</button>
+              <div></div>
+              <button class="touch-btn dpad-btn" id="touchSnakeLeft">◀</button>
+              <div class="dpad-center"></div>
+              <button class="touch-btn dpad-btn" id="touchSnakeRight">▶</button>
+              <div></div>
+              <button class="touch-btn dpad-btn" id="touchSnakeDown">▼</button>
+              <div></div>
+            </div>
           </div>
         </div>
       </div>
