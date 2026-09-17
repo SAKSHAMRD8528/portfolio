@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="cyber">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -20,7 +20,7 @@
   <!-- Devicon — Technology Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.16.0/devicon.min.css" />
 
-  <link rel="stylesheet" href="css/style.css?v=34.0" />
+  <link rel="stylesheet" href="css/style.css?v=35.0" />
   <style>
     /* Hide native cursor everywhere — custom cursor handles all pointing */
     html, html *, html *::before, html *::after {
@@ -35,6 +35,21 @@
   </style>
 </head>
 <body>
+
+  <!-- ========== LOADING SCREEN ========== -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-inner">
+      <div class="loading-logo">SD<span class="loading-dot">.</span></div>
+      <div class="loading-bar-track"><div class="loading-bar-fill" id="loadingBarFill"></div></div>
+      <p class="loading-text" id="loadingText">Initializing portfolio...</p>
+    </div>
+  </div>
+
+  <!-- ========== SCROLL PROGRESS BAR ========== -->
+  <div class="scroll-progress-bar" id="scrollProgressBar"></div>
+
+  <!-- ========== NOISE TEXTURE OVERLAY ========== -->
+  <div class="noise-overlay" aria-hidden="true"></div>
 
   <!-- Custom Cursor -->
   <div class="cursor-dot" id="cursorDot"></div>
@@ -93,7 +108,21 @@
   <!-- ========== HERO ========== -->
   <section class="hero" id="hero">
     <canvas id="particleCanvas"></canvas>
+    <!-- Hero decorative grid background -->
+    <div class="hero-grid-bg" aria-hidden="true"></div>
+    <!-- Floating code decorations -->
+    <div class="hero-code-float hero-code-1" aria-hidden="true"><span class="code-keyword">const</span> saksham = <span class="code-string">'engineer'</span>;</div>
+    <div class="hero-code-float hero-code-2" aria-hidden="true"><span class="code-keyword">await</span> solve(problem);</div>
+    <div class="hero-code-float hero-code-3" aria-hidden="true">ml.<span class="code-fn">predict</span>(data);</div>
+    <div class="hero-code-float hero-code-4" aria-hidden="true"><span class="code-keyword">return</span> <span class="code-string">excellence</span>;</div>
+
     <div class="hero-content">
+      <!-- Availability Badge -->
+      <div class="hero-availability reveal-up">
+        <span class="availability-dot"></span>
+        <span>Open to Opportunities</span>
+      </div>
+
       <p class="hero-greeting reveal-up">Hello, I'm</p>
       <h1 class="hero-name reveal-up">Saksham <span class="accent">Dhumale</span></h1>
       <p class="hero-title">
@@ -103,15 +132,15 @@
       </p>
       <p class="hero-subtitle reveal-up">Turning data into insights, ideas into code, and problems into solutions.</p>
       <div class="hero-cta reveal-up">
-        <a href="#projects" class="btn btn-primary">
+        <a href="#projects" class="btn btn-primary magnetic-btn" id="heroViewWorkBtn">
           <span>View My Work</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
-        <button class="btn btn-outline btn-hero-terminal" id="heroTerminalBtn" data-open-terminal="true">
+        <button class="btn btn-outline btn-hero-terminal magnetic-btn" id="heroTerminalBtn" data-open-terminal="true">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
           <span>Terminal</span>
         </button>
-        <a href="Saksham_Dhumale_Master_Resume.pdf" class="btn btn-outline" id="heroResumeBtn" data-open-resume="true">
+        <a href="Saksham_Dhumale_Master_Resume.pdf" class="btn btn-outline magnetic-btn" id="heroResumeBtn" data-open-resume="true">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
           <span>View Resume</span>
         </a>
@@ -127,16 +156,28 @@
 
   <!-- ========== ABOUT ========== -->
   <section class="section about" id="about">
+    <div class="section-divider" aria-hidden="true"></div>
     <div class="container">
       <h2 class="section-title reveal-up">About <span class="accent">Me</span></h2>
       <div class="section-line reveal-up"></div>
       <div class="about-grid">
         <div class="about-avatar reveal-left">
           <div class="avatar-frame">
+            <div class="avatar-ring avatar-ring-1"></div>
+            <div class="avatar-ring avatar-ring-2"></div>
+            <div class="avatar-ring avatar-ring-3"></div>
             <div class="avatar-placeholder">
               <img src="images/profile.jpg" alt="Saksham Dhumale" />
             </div>
             <div class="avatar-orbit"></div>
+          </div>
+          <!-- GitHub Stats Card -->
+          <div class="github-stats-card reveal-up">
+            <div class="github-stats-header">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+              <span>GitHub Activity</span>
+            </div>
+            <img src="https://github-readme-stats.vercel.app/api?username=SAKSHAMRD8528&show_icons=true&theme=transparent&hide_border=true&title_color=6c63ff&icon_color=00d4ff&text_color=a0a0b8&bg_color=00000000&count_private=true" alt="GitHub Stats" class="github-stats-img" loading="lazy" />
           </div>
         </div>
         <div class="about-text reveal-right">
@@ -144,7 +185,7 @@
             I'm a <strong>Computer Science Engineer</strong> and software developer passionate about architecting intelligent systems, robust web applications, and deriving actionable insights from data.
           </p>
           <p>
-            With a degree in Computer Science & Engineering, my expertise spans across <strong>Full-Stack Web Development</strong> with Flask, <strong>Machine Learning & Computer Vision</strong> using TensorFlow and OpenCV, and <strong>Data Analysis & Engineering</strong> with SQL, Python, and PowerBI. I thrive on architecting end-to-end technical solutions to solve real-world problems.
+            With a degree in Computer Science &amp; Engineering, my expertise spans across <strong>Full-Stack Web Development</strong> with Flask, <strong>Machine Learning &amp; Computer Vision</strong> using TensorFlow and OpenCV, and <strong>Data Analysis &amp; Engineering</strong> with SQL, Python, and PowerBI. I thrive on architecting end-to-end technical solutions to solve real-world problems.
           </p>
           <p>
             Outside of coding, I enjoy playing video games, exploring new music, and keeping up with the latest in tech.
@@ -164,7 +205,7 @@
             </div>
           </div>
           <div class="about-actions reveal-up" style="margin-top: 28px;">
-            <a href="Saksham_Dhumale_Master_Resume.pdf" class="btn btn-primary" data-open-resume="true">
+            <a href="Saksham_Dhumale_Master_Resume.pdf" class="btn btn-primary magnetic-btn" data-open-resume="true">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               <span>View Resume</span>
             </a>
@@ -304,7 +345,7 @@
       <h2 class="section-title reveal-up">Featured <span class="accent">Projects</span></h2>
       <div class="section-line reveal-up"></div>
 
-      <div class="projects-grid">
+      <div class="projects-grid" id="projectsGrid">
         <a href="https://github.com/SAKSHAMRD8528/endometrium-cancer-detection" target="_blank" rel="noopener" class="project-card reveal-up" id="project-1">
           <div class="project-card-inner">
             <div class="project-visual">
@@ -354,6 +395,29 @@
             </div>
           </div>
         </a>
+
+        <!-- Project 3: Coming Soon -->
+        <div class="project-card project-card-coming-soon reveal-up" id="project-3">
+          <div class="project-card-inner">
+            <div class="project-visual">
+              <div class="project-visual-bg" style="--accent-1: #43e97b; --accent-2: #38f9d7;">
+                <div class="project-icon-large">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+              </div>
+            </div>
+            <div class="project-info">
+              <div class="project-tags">
+                <span class="project-tag">In Progress</span>
+              </div>
+              <h3 class="project-title">Next Project</h3>
+              <p class="project-desc">
+                Something exciting is brewing. Stay tuned — a new project powered by cutting-edge technology is coming soon to this space.
+              </p>
+              <span class="project-cta coming-soon-cta">Coming Soon ✦</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -545,10 +609,44 @@
 
   <!-- ========== FOOTER ========== -->
   <footer class="footer">
+    <!-- Tech Marquee -->
+    <div class="footer-marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>Python</span><span class="marquee-sep">✦</span>
+        <span>Java</span><span class="marquee-sep">✦</span>
+        <span>Flask</span><span class="marquee-sep">✦</span>
+        <span>TensorFlow</span><span class="marquee-sep">✦</span>
+        <span>OpenCV</span><span class="marquee-sep">✦</span>
+        <span>CNN</span><span class="marquee-sep">✦</span>
+        <span>MySQL</span><span class="marquee-sep">✦</span>
+        <span>SQLite</span><span class="marquee-sep">✦</span>
+        <span>PowerBI</span><span class="marquee-sep">✦</span>
+        <span>Git</span><span class="marquee-sep">✦</span>
+        <span>REST APIs</span><span class="marquee-sep">✦</span>
+        <span>Data Visualization</span><span class="marquee-sep">✦</span>
+        <span>Machine Learning</span><span class="marquee-sep">✦</span>
+        <span>Computer Vision</span><span class="marquee-sep">✦</span>
+        <!-- Duplicate for seamless loop -->
+        <span>Python</span><span class="marquee-sep">✦</span>
+        <span>Java</span><span class="marquee-sep">✦</span>
+        <span>Flask</span><span class="marquee-sep">✦</span>
+        <span>TensorFlow</span><span class="marquee-sep">✦</span>
+        <span>OpenCV</span><span class="marquee-sep">✦</span>
+        <span>CNN</span><span class="marquee-sep">✦</span>
+        <span>MySQL</span><span class="marquee-sep">✦</span>
+        <span>SQLite</span><span class="marquee-sep">✦</span>
+        <span>PowerBI</span><span class="marquee-sep">✦</span>
+        <span>Git</span><span class="marquee-sep">✦</span>
+        <span>REST APIs</span><span class="marquee-sep">✦</span>
+        <span>Data Visualization</span><span class="marquee-sep">✦</span>
+        <span>Machine Learning</span><span class="marquee-sep">✦</span>
+        <span>Computer Vision</span><span class="marquee-sep">✦</span>
+      </div>
+    </div>
     <div class="container">
       <div class="footer-content">
         <p class="footer-logo">SD<span class="accent">.</span></p>
-        <p class="footer-text">Designed & Built by <strong>Saksham Dhumale</strong></p>
+        <p class="footer-text">Designed &amp; Built by <strong>Saksham Dhumale</strong></p>
         <p class="footer-copy">&copy; 2026 All rights reserved.</p>
       </div>
       <button class="back-to-top" id="backToTop" aria-label="Back to top">
@@ -709,9 +807,9 @@
   <!-- PDF.js — Cross-platform Canvas PDF Renderer for Mobile & Desktop -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
-  <script src="js/particles.js?v=33.0"></script>
-  <script src="js/main.js?v=33.0"></script>
-  <script src="js/terminal.js?v=33.0"></script>
-  <script src="js/game.js?v=33.0"></script>
+  <script src="js/particles.js?v=35.0"></script>
+  <script src="js/main.js?v=35.0"></script>
+  <script src="js/terminal.js?v=35.0"></script>
+  <script src="js/game.js?v=35.0"></script>
 </body>
 </html>

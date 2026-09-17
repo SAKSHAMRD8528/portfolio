@@ -5,7 +5,82 @@
 (function () {
   function initMain() {
 
+  /* ===== LOADING SCREEN ===== */
+  const loadingScreen = document.getElementById('loadingScreen');
+  const loadingBarFill = document.getElementById('loadingBarFill');
+  const loadingText = document.getElementById('loadingText');
+  const loadingMessages = [
+    'Initializing portfolio...',
+    'Loading projects...',
+    'Calibrating skills...',
+    'Almost ready...'
+  ];
+  let loadingProgress = 0;
+  let loadingMsgIdx = 0;
 
+  function advanceLoading() {
+    loadingProgress += Math.random() * 28 + 10;
+    if (loadingProgress > 100) loadingProgress = 100;
+    if (loadingBarFill) loadingBarFill.style.width = loadingProgress + '%';
+    if (loadingText && loadingMsgIdx < loadingMessages.length) {
+      loadingText.textContent = loadingMessages[loadingMsgIdx++];
+    }
+    if (loadingProgress < 100) {
+      setTimeout(advanceLoading, 120 + Math.random() * 100);
+    } else {
+      setTimeout(() => {
+        if (loadingScreen) loadingScreen.classList.add('done');
+      }, 350);
+    }
+  }
+  advanceLoading();
+
+  /* ===== SCROLL PROGRESS BAR ===== */
+  const scrollProgressBar = document.getElementById('scrollProgressBar');
+  function updateScrollProgress() {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    if (scrollProgressBar) scrollProgressBar.style.width = pct + '%';
+  }
+  window.addEventListener('scroll', updateScrollProgress, { passive: true });
+  updateScrollProgress();
+
+  /* ===== PROJECT CARD SPOTLIGHT TRACKING ===== */
+  document.querySelectorAll('.project-card:not(.project-card-coming-soon)').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      card.style.setProperty('--spotlight-x', x + '%');
+      card.style.setProperty('--spotlight-y', y + '%');
+    });
+  });
+
+  /* ===== MAGNETIC BUTTON EFFECT ===== */
+  const isMobileDevice = window.innerWidth <= 768;
+  if (!isMobileDevice) {
+    document.querySelectorAll('.magnetic-btn').forEach(btn => {
+      btn.addEventListener('mousemove', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const dx = e.clientX - (rect.left + rect.width / 2);
+        const dy = e.clientY - (rect.top + rect.height / 2);
+        const strength = 0.28;
+        btn.style.transform = `translate(${dx * strength}px, ${dy * strength}px)`;
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transform = '';
+      });
+    });
+  }
+
+  /* ===== STAGGER SKILL ITEMS ON REVEAL ===== */
+  document.querySelectorAll('.skill-category').forEach(cat => {
+    const items = cat.querySelectorAll('.skill-item');
+    items.forEach((item, i) => {
+      item.classList.add('stagger-' + Math.min(i + 1, 8));
+    });
+  });
 
   /* ===== CUSTOM CURSOR (DOT & RING — PC ONLY) ===== */
   const cursorDot = document.getElementById('cursorDot');
@@ -135,7 +210,7 @@
 
   // Load saved settings
   const savedMode  = localStorage.getItem('portfolioMode') || 'dark';
-  const savedTheme = localStorage.getItem('portfolioTheme') || 'matrix';
+  const savedTheme = localStorage.getItem('portfolioTheme') || 'cyber';
 
   applyMode(savedMode);
   applyTheme(savedTheme);

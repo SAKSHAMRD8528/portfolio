@@ -1,4 +1,454 @@
 /* ============================================
+   SAKSHAM DHUMALE — PORTFOLIO v35
+   PROFESSIONAL UPGRADE — PREMIUM LAYER
+   ============================================ */
+
+/* ========== LOADING SCREEN ========== */
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  background: #05050f;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+.loading-screen.done {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.loading-inner {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+.loading-logo {
+  font-family: 'Space Grotesk', 'JetBrains Mono', monospace;
+  font-size: 4rem;
+  font-weight: 800;
+  letter-spacing: -3px;
+  color: #fff;
+  animation: loadingPulse 1.4s ease-in-out infinite;
+}
+.loading-dot {
+  color: #6c63ff;
+}
+@keyframes loadingPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(0.96); }
+}
+.loading-bar-track {
+  width: 200px;
+  height: 3px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+.loading-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #6c63ff, #00d4ff);
+  border-radius: 9999px;
+  transition: width 0.05s linear;
+}
+.loading-text {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 1.5px;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+}
+
+/* ========== SCROLL PROGRESS BAR ========== */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, #6c63ff, #00d4ff, #6c63ff);
+  background-size: 200% 100%;
+  animation: shimmerProgress 2s linear infinite;
+  z-index: 9999;
+  border-radius: 0 2px 2px 0;
+  transition: width 0.1s linear;
+}
+@keyframes shimmerProgress {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 200% 0%; }
+}
+
+/* ========== NOISE TEXTURE OVERLAY ========== */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* ========== HERO GRID BACKGROUND ========== */
+.hero-grid-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(108, 99, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(108, 99, 255, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%);
+}
+
+/* ========== FLOATING CODE DECORATIONS ========== */
+.hero-code-float {
+  position: absolute;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  padding: 8px 14px;
+  background: rgba(108, 99, 255, 0.08);
+  border: 1px solid rgba(108, 99, 255, 0.18);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  color: rgba(160, 160, 184, 0.7);
+  pointer-events: none;
+  z-index: 0;
+  animation: codeFloat 6s ease-in-out infinite;
+}
+.code-keyword { color: #6c63ff; }
+.code-string  { color: #00d4ff; }
+.code-fn      { color: #f7c06e; }
+
+.hero-code-1 { top: 20%; left: 5%; animation-delay: 0s; animation-duration: 7s; }
+.hero-code-2 { top: 65%; left: 3%; animation-delay: 1.5s; animation-duration: 8s; }
+.hero-code-3 { top: 22%; right: 5%; animation-delay: 0.8s; animation-duration: 6.5s; }
+.hero-code-4 { top: 70%; right: 4%; animation-delay: 2.2s; animation-duration: 7.5s; }
+
+@keyframes codeFloat {
+  0%, 100% { transform: translateY(0px) rotate(-1deg); opacity: 0.6; }
+  50%       { transform: translateY(-14px) rotate(1deg); opacity: 0.9; }
+}
+@media (max-width: 768px) {
+  .hero-code-float { display: none; }
+}
+
+/* ========== AVAILABILITY BADGE ========== */
+.hero-availability {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 18px;
+  background: rgba(39, 201, 63, 0.1);
+  border: 1px solid rgba(39, 201, 63, 0.3);
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #27c93f;
+  letter-spacing: 0.4px;
+  margin-bottom: 20px;
+}
+.availability-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #27c93f;
+  box-shadow: 0 0 0 0 rgba(39, 201, 63, 0.4);
+  animation: availabilityPing 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes availabilityPing {
+  0%   { box-shadow: 0 0 0 0 rgba(39, 201, 63, 0.4); }
+  70%  { box-shadow: 0 0 0 8px rgba(39, 201, 63, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(39, 201, 63, 0); }
+}
+
+/* ========== SECTION DIVIDER ========== */
+.section-divider {
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(to bottom, var(--bg-primary, #000) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ========== ENHANCED AVATAR RINGS ========== */
+.avatar-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid;
+  pointer-events: none;
+}
+.avatar-ring-1 {
+  inset: -16px;
+  border-color: rgba(108, 99, 255, 0.25);
+  animation: ringPulse 3s ease-in-out infinite;
+}
+.avatar-ring-2 {
+  inset: -32px;
+  border-color: rgba(0, 212, 255, 0.15);
+  animation: ringPulse 3s ease-in-out infinite 0.5s;
+}
+.avatar-ring-3 {
+  inset: -48px;
+  border-color: rgba(108, 99, 255, 0.08);
+  animation: ringPulse 3s ease-in-out infinite 1s;
+}
+@keyframes ringPulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50%       { opacity: 1; transform: scale(1.02); }
+}
+
+/* ========== GITHUB STATS CARD ========== */
+.github-stats-card {
+  margin-top: 28px;
+  background: rgba(108, 99, 255, 0.05);
+  border: 1px solid rgba(108, 99, 255, 0.15);
+  border-radius: 16px;
+  padding: 16px;
+  overflow: hidden;
+  transition: all 0.35s ease;
+}
+.github-stats-card:hover {
+  border-color: rgba(108, 99, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(108, 99, 255, 0.15);
+  transform: translateY(-3px);
+}
+.github-stats-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-muted, #6c6c84);
+  margin-bottom: 12px;
+}
+.github-stats-header svg {
+  color: var(--text-secondary, #a0a0b8);
+  flex-shrink: 0;
+}
+.github-stats-img {
+  width: 100%;
+  border-radius: 8px;
+  display: block;
+  min-height: 60px;
+}
+
+/* ========== PROJECTS — 3-COLUMN GRID ========== */
+#projectsGrid {
+  grid-template-columns: repeat(3, 1fr);
+}
+@media (max-width: 1024px) {
+  #projectsGrid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  #projectsGrid { grid-template-columns: 1fr; }
+}
+
+/* Coming Soon Project Card */
+.project-card-coming-soon {
+  opacity: 0.75;
+  cursor: default;
+  border-style: dashed !important;
+}
+.project-card-coming-soon:hover {
+  opacity: 0.9;
+  border-style: dashed !important;
+}
+.coming-soon-cta {
+  color: var(--text-muted) !important;
+  letter-spacing: 1px;
+  font-size: 0.85rem !important;
+}
+
+/* Project card spotlight effect */
+.project-card {
+  --spotlight-x: 50%;
+  --spotlight-y: 50%;
+}
+.project-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(600px circle at var(--spotlight-x) var(--spotlight-y), rgba(108, 99, 255, 0.08), transparent 50%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+.project-card:hover::before {
+  opacity: 1;
+}
+
+/* ========== FOOTER MARQUEE ========== */
+.footer-marquee {
+  border-top: 1px solid var(--border-color, rgba(108, 99, 255, 0.15));
+  border-bottom: 1px solid var(--border-color, rgba(108, 99, 255, 0.15));
+  padding: 14px 0;
+  overflow: hidden;
+  position: relative;
+  background: var(--bg-secondary, #12121a);
+  margin-bottom: 0;
+}
+.footer-marquee::before,
+.footer-marquee::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 120px;
+  z-index: 2;
+  pointer-events: none;
+}
+.footer-marquee::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg-secondary, #12121a), transparent);
+}
+.footer-marquee::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg-secondary, #12121a), transparent);
+}
+.marquee-track {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  width: max-content;
+  animation: marqueeScroll 30s linear infinite;
+  white-space: nowrap;
+}
+.marquee-track span {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-muted, #6c6c84);
+  transition: color 0.2s;
+}
+.marquee-track span:hover {
+  color: var(--accent-primary, #6c63ff);
+}
+.marquee-sep {
+  color: var(--accent-primary, #6c63ff) !important;
+  opacity: 0.5;
+  font-size: 0.55rem !important;
+}
+@keyframes marqueeScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.footer-marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* ========== MAGNETIC BUTTON EFFECT ========== */
+.magnetic-btn {
+  transform-origin: center;
+  will-change: transform;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+              box-shadow 0.35s ease,
+              background 0.35s ease,
+              border-color 0.35s ease;
+}
+
+/* ========== STAGGER ANIMATION DELAYS ========== */
+.stagger-1 { transition-delay: 0.05s; }
+.stagger-2 { transition-delay: 0.1s; }
+.stagger-3 { transition-delay: 0.15s; }
+.stagger-4 { transition-delay: 0.2s; }
+.stagger-5 { transition-delay: 0.25s; }
+.stagger-6 { transition-delay: 0.3s; }
+.stagger-7 { transition-delay: 0.35s; }
+.stagger-8 { transition-delay: 0.4s; }
+
+/* ========== PROJECT CARD SPOTLIGHT TRACKING ========== */
+.project-card { position: relative; overflow: hidden; }
+
+/* ========== ENHANCED SECTION TITLES ========== */
+.section-title {
+  position: relative;
+}
+
+/* ========== CONTACT — AVAILABILITY INDICATOR ========== */
+.contact-availability-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background: rgba(39, 201, 63, 0.08);
+  border: 1px solid rgba(39, 201, 63, 0.25);
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #27c93f;
+  margin-bottom: 20px;
+}
+
+/* ========== SMOOTH SCROLL SNAP HINT ========== */
+.hero-scroll-indicator {
+  cursor: pointer;
+}
+
+/* ========== THEME ADAPTIVE — Matrix override ========== */
+body.theme-matrix .hero-grid-bg {
+  background-image:
+    linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+body.theme-matrix .scroll-progress-bar {
+  background: linear-gradient(90deg, #00ff41, #00cc33, #00ff41);
+}
+body.theme-matrix .hero-availability {
+  background: rgba(0, 255, 65, 0.08);
+  border-color: rgba(0, 255, 65, 0.25);
+  color: #00ff41;
+}
+body.theme-matrix .availability-dot {
+  background: #00ff41;
+}
+body.theme-matrix .availability-dot {
+  animation: availabilityPingMatrix 2s ease-in-out infinite;
+}
+@keyframes availabilityPingMatrix {
+  0%  { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.5); }
+  70% { box-shadow: 0 0 0 8px rgba(0, 255, 65, 0); }
+}
+body.theme-matrix .hero-code-float {
+  background: rgba(0, 255, 65, 0.06);
+  border-color: rgba(0, 255, 65, 0.15);
+}
+body.theme-matrix .code-keyword { color: #00ff41; }
+body.theme-matrix .code-string  { color: #00cc33; }
+body.theme-matrix .code-fn      { color: #33ff66; }
+body.theme-matrix .avatar-ring-1 { border-color: rgba(0, 255, 65, 0.3); }
+body.theme-matrix .avatar-ring-2 { border-color: rgba(0, 255, 65, 0.15); }
+body.theme-matrix .avatar-ring-3 { border-color: rgba(0, 255, 65, 0.08); }
+body.theme-matrix .github-stats-card {
+  background: rgba(0, 255, 65, 0.04);
+  border-color: rgba(0, 255, 65, 0.15);
+}
+body.theme-matrix .project-card::before {
+  background: radial-gradient(600px circle at var(--spotlight-x) var(--spotlight-y), rgba(0, 255, 65, 0.05), transparent 50%);
+}
+
+/* ============================================
+   ORIGINAL STYLES BELOW (UNCHANGED)
+   ============================================ */
+
+/* ============================================
    SAKSHAM DHUMALE — MATRIX/HACKER THEME
    ============================================ */
 
