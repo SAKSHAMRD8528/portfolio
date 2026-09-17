@@ -23,13 +23,23 @@
   }
 
   function getAccentColor() {
-    const theme = document.documentElement.getAttribute('data-theme');
-    return theme === 'light' ? 'rgba(0, 102, 0,' : 'rgba(0, 255, 65,';
+    const theme = document.documentElement.getAttribute('data-theme') || 'cyber';
+    const mode = document.documentElement.getAttribute('data-mode');
+    if (mode === 'light') return 'rgba(99, 102, 241,';
+    if (theme === 'matrix') return 'rgba(0, 255, 102,';
+    if (theme === 'synthwave') return 'rgba(255, 0, 127,';
+    if (theme === 'ocean') return 'rgba(0, 242, 254,';
+    return 'rgba(99, 102, 241,';
   }
 
   function getSecondaryColor() {
-    const theme = document.documentElement.getAttribute('data-theme');
-    return theme === 'light' ? 'rgba(0, 153, 0,' : 'rgba(0, 204, 51,';
+    const theme = document.documentElement.getAttribute('data-theme') || 'cyber';
+    const mode = document.documentElement.getAttribute('data-mode');
+    if (mode === 'light') return 'rgba(168, 85, 247,';
+    if (theme === 'matrix') return 'rgba(16, 185, 129,';
+    if (theme === 'synthwave') return 'rgba(139, 92, 246,';
+    if (theme === 'ocean') return 'rgba(59, 130, 246,';
+    return 'rgba(168, 85, 247,';
   }
 
   function resize() {
