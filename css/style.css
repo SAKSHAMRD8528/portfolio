@@ -4316,44 +4316,41 @@ body.theme-matrix .section-line {
 .cmd-palette-overlay {
   position: fixed;
   inset: 0;
-  z-index: 99999;
-  display: flex;
+  z-index: 999999;
+  display: none;
   align-items: flex-start;
   justify-content: center;
   padding-top: 12vh;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .cmd-palette-overlay.active {
-  opacity: 1;
-  pointer-events: auto;
+  display: flex !important;
 }
 
 .cmd-palette-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 .cmd-palette-container {
   position: relative;
+  z-index: 10;
   width: 90%;
   max-width: 620px;
-  background: rgba(18, 18, 26, 0.95);
-  border: 1px solid rgba(108, 99, 255, 0.35);
+  background: rgba(18, 18, 26, 0.98);
+  border: 1px solid rgba(108, 99, 255, 0.4);
   border-radius: 16px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(108, 99, 255, 0.25);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9), 0 0 30px rgba(108, 99, 255, 0.25);
   overflow: hidden;
-  transform: scale(0.95);
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: modalPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.cmd-palette-overlay.active .cmd-palette-container {
-  transform: scale(1);
+@keyframes modalPopIn {
+  from { transform: scale(0.92) translateY(15px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
 }
 
 .cmd-palette-search {
@@ -4461,46 +4458,38 @@ body.theme-matrix .section-line {
 .project-modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 9999;
-  display: flex;
+  z-index: 999999;
+  display: none;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .project-modal-overlay.active {
-  opacity: 1;
-  pointer-events: auto;
+  display: flex !important;
 }
 
 .project-modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
 }
 
 .project-modal-container {
   position: relative;
+  z-index: 10;
   width: 100%;
   max-width: 780px;
   max-height: 90vh;
   overflow-y: auto;
-  background: rgba(20, 20, 30, 0.95);
-  border: 1px solid rgba(108, 99, 255, 0.3);
+  background: rgba(20, 20, 30, 0.98);
+  border: 1px solid rgba(108, 99, 255, 0.35);
   border-radius: 20px;
   padding: 30px;
-  box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-  transform: translateY(20px);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.project-modal-overlay.active .project-modal-container {
-  transform: translateY(0);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.9);
+  animation: modalPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .project-modal-close {
@@ -4586,26 +4575,23 @@ body.theme-matrix .section-line {
 .achieve-modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 9999;
-  display: flex;
+  z-index: 999999;
+  display: none;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .achieve-modal-overlay.active {
-  opacity: 1;
-  pointer-events: auto;
+  display: flex !important;
 }
 
 .achieve-modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(10px);
 }
 
 .achieve-modal-container {
@@ -4613,17 +4599,12 @@ body.theme-matrix .section-line {
   z-index: 10;
   width: 100%;
   max-width: 640px;
-  background: rgba(18, 18, 28, 0.96);
-  border: 1px solid rgba(255, 189, 46, 0.35);
+  background: rgba(18, 18, 28, 0.98);
+  border: 1px solid rgba(255, 189, 46, 0.4);
   border-radius: 20px;
   padding: 24px 28px;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 189, 46, 0.15);
-  transform: scale(0.95) translateY(10px);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.achieve-modal-overlay.active .achieve-modal-container {
-  transform: scale(1) translateY(0);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 30px rgba(255, 189, 46, 0.2);
+  animation: modalPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .achieve-modal-header {
